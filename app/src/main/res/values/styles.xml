@@ -1,0 +1,10 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    </style>
+
+    <style name="Dialog" parent="android:Theme.Holo.Dialog">
+    </style>
+
+</resources>

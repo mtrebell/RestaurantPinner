@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:uiOptions="splitActionBarWhenNarrow">
+    <!-- Search / will display always -->
+    <item android:id="@+id/action_search"
+        android:icon="@drawable/ic_action_search"
+        android:title="@string/action_search"
+        android:showAsAction="always"/>
+
+    <!-- Location Found -->
+    <item android:id="@+id/action_newpin"
+        android:icon="@drawable/ic_action_newpin"
+        android:title="@string/action_newpin"
+        android:showAsAction="always" />
+
+    <!-- Refresh -->
+    <item android:id="@+id/action_notification"
+        android:icon="@drawable/ic_action_notification"
+        android:title="@string/action_notification"
+        android:showAsAction="always"/>
+
+</menu>

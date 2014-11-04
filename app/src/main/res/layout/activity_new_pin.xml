@@ -1,0 +1,75 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/addPinLoc"
+            android:layout_span="2"
+            android:layout_height="wrap_content"
+            android:hint="@string/addPin_hintLoc"
+            android:inputType="text"
+            android:layout_weight=".66"/>
+
+        <Button
+            android:id="@+id/button_current"
+            android:text="@string/button_current_text" />
+    </TableRow>
+
+    <TableRow>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_button"
+            android:layout_weight=".25"
+         />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_button"
+            android:layout_weight=".25"
+         />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_button"
+            android:layout_weight=".25"
+         />
+    </TableRow>
+
+    <TableRow>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_button"
+            android:layout_weight=".25"
+            />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_button"
+            android:layout_weight=".25"
+            />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_button"
+            android:layout_weight=".25"
+            />
+    </TableRow>
+    <TableRow>
+        <Button
+            android:id="@+id/button_send"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:text="@string/button_send_text" />
+
+        <Button
+            android:id="@+id/button_clear"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:text="@string/button_clear_text" />
+    </TableRow>
+
+</TableLayout>

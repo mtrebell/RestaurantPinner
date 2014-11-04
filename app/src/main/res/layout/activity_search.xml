@@ -1,0 +1,92 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/searchNam"
+            android:layout_span="2"
+            android:layout_height="wrap_content"
+            android:hint="@string/search_hintName"
+            android:inputType="text"
+            android:imeOptions="actionSend"
+            android:layout_weight="1"/>
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/searchLoc"
+            android:layout_span="2"
+            android:layout_height="wrap_content"
+            android:hint="@string/search_hintLoc"
+            android:inputType="text"
+            android:imeOptions="actionSend"
+            android:layout_weight="1"/>
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:id="@+id/seekbar_value"
+            android:text="@string/distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <SeekBar
+                android:id="@+id/seekbar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:progress="20"
+                android:max="20"
+                android:layout_weight="0.8"
+                />
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+               >
+                <TextView
+                    android:paddingLeft="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                   />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:paddingRight="10dp"
+                    android:text="20" />
+            </RelativeLayout>
+
+            </LinearLayout>
+
+    </TableRow>
+
+    <TableRow>
+    <Button
+        android:id="@+id/button_send"
+        android:layout_weight=".5"
+        android:layout_height="wrap_content"
+        android:text="@string/button_send_text" />
+
+    <Button
+        android:id="@+id/button_clear"
+        android:layout_weight=".5"
+        android:layout_height="wrap_content"
+        android:text="@string/button_clear_text" />
+    </TableRow>
+
+</TableLayout>
