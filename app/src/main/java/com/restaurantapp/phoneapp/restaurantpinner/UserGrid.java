@@ -1,10 +1,16 @@
 package com.example.fix.myapplication;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -14,43 +20,91 @@ import org.json.JSONObject;
  */
 public class UserGrid {
     String baseUrl;
+    String accesstoken;
+    String uId;
 
     public UserGrid(String address,String org,String app){
         baseUrl = address+'/'+org+'/'+app;
+        accesstoken = null;
+        uId = null;
     }
 
    // Account Functions:
-    public String login(String user,String password){
-        String accessToken = "";
+    public boolean login(String user,String password){
         String query = "/token?grant_type=password&username="+user+"&password="+password;
-        request(query,"GET");
+        JSONArray response = sendGet(query);
+        //request(query,"GET");
         //Parse this
-        return accessToken;
+        try{
+            JSONObject userInfo = response.getJSONObject(0);
+            accesstoken = userInfo.getString("access_token");
+            uId = userInfo.getJSONObject("user").getString("uuid");
+        }catch(JSONException e){
+            accesstoken = null;
+            uId = null;
+            return false;
+        }
+        return true;
     }
 
     public boolean logout(String user){
-        String query = "/users/"+user+"/revoketokens";
-        request(query,"PUT");
+        String query = "/users/"+user+"/revoketokens?access_token="+accesstoken;
+
+        //request(query, "PUT");
+        try {
+            JSONArray response = sendPut(query, null);
+        }catch(JSONException e){
+            return false;
+        }catch(IOException e){
+            return false;
+        }
+        accesstoken = null;
+        uId = null;
+
         return true;
     }
 
     public boolean chgPassword(String user,String oldPass,String newPass){
-        String address = "/users/"+user+"/password";
-        String json = "{password:" + newPass + ",newPassword:" + newPass +"}"; //Look up to verify correctneess
-        put(address,json);
+        String query = "/users/"+user+"/password";
+        String params = "{\"newpassword\":" + newPass + ",\"oldPassword\":" + oldPass +"}";
+
+        try {
+            JSONObject jsonParam = new JSONObject(params);
+            JSONArray response = sendPut(query, jsonParam);
+        }catch(JSONException e){
+            System.out.println(e.getMessage());
+            return false;
+        }catch(IOException e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        //put(address,json);
         return true;
     }
 
     public boolean addAccount(String username,String pass){
-        String address = "/users";
-        String json = "{username:" + username + ",password:" + pass +"}"; //Look up to verify correctneess
-        put(address,json);
+        String query = "/users";
+        String params = "{\"username\":"+ username + ", \"password\":"+ pass + "}";
+
+        try {
+            JSONObject jsonParam = new JSONObject(params);
+            JSONArray response = sendPut(query, jsonParam);
+            System.out.println(response.toString());
+        }catch(JSONException e){
+            System.out.println(e.getMessage());
+            return false;
+        }catch(IOException e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+        //put(address,json);
         return true;
     }
 
     public boolean deleteAccount(String username,String pass)
     {
-        String query = "/users/"+username;
+        String query = "/users/"+username+"?access_token="+accesstoken;
         request(query, "DELETE");
         return true;
     }
@@ -58,7 +112,7 @@ public class UserGrid {
     //Friend Functions:
     public List<String> getFriends(String user){
         List<String> friends = new ArrayList<String>();
-        String query = "users/"+user+"/friends";
+        String query = "/users/"+user+"/friends";
         String response = request(query,"GET");
         //Parse funcition
         return friends;
@@ -67,20 +121,20 @@ public class UserGrid {
     //Verify: Can do this search?
     public List<String> findFriend(String user,String friend){
         List<String> friends = new ArrayList<String>();
-        String query = "users/"+user+"/friends?ql= select * where name contains \'" + friend +'\'';
+        String query = "/users/"+user+"/friends?ql= select * where name contains \'" + friend +'\'';
         String response = request(query,"GET");
         //Parse funcition
         return friends;
     }
 
     public boolean addFriend(String user,String friend){
-        String query = "users/" + user + "/friends/"+friend;
+        String query = "/users/" + user + "/friends/"+friend;
         String response = request(query,"POST");
         return true;
     }
 
     public boolean removeFriend(String user, String friend){
-        String query = "users/" + user + "/friends/"+friend;
+        String query = "/users/" + user + "/friends/"+friend;
         String response = request(query,"DELETE");
         return true;
     }
@@ -201,6 +255,79 @@ public class UserGrid {
         }catch(Exception e){
             return null;
         }
+    }
+
+    private JSONArray sendGet(String query){
+        URL url;
+        try{
+            url = new URL(baseUrl + query);
+        }catch(Exception e){
+            return null;
+        }
+
+        HttpURLConnection con;
+        try{
+            con = (HttpURLConnection) url.openConnection();
+        }catch (Exception e){
+            return null;
+        }
+
+        JSONArray results;
+        try{
+            InputStreamReader in =  new InputStreamReader(con.getInputStream());
+            results = readStream(new BufferedReader(in));
+        }catch (Exception e){
+            return null;
+        }finally {
+            con.disconnect();
+        }
+        return results;
+    }
+
+    static public JSONArray readStream(BufferedReader in) throws IOException, JSONException{
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while((inputLine = in.readLine()) != null){
+            response.append(inputLine);
+        }
+        JSONArray data = new JSONArray();
+        JSONObject collections = new JSONObject(response.toString());
+        data.put(collections);
+
+        return data;
+    }
+
+    private JSONArray sendPut(String query, JSONObject jsonParam) throws IOException, JSONException {
+        URL url = new URL(baseUrl + query);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setDoOutput(true);
+        con.setRequestProperty("Content-Type", "application/json");
+        //con.setRequestMethod("POST");
+
+        OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+        if(jsonParam != null){
+            String data = jsonParam.toString();
+            wr.write(data);
+        }
+        wr.flush();
+
+        JSONArray results;
+        try {
+            InputStreamReader in = new InputStreamReader(con.getInputStream());
+            results= readStream(new BufferedReader(in));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        } catch (JSONException e){
+            System.out.println(e.getMessage());
+            return null;
+        }finally {
+            con.disconnect();
+        }
+        return  results;
+
+        //return null;
     }
 
     private boolean put(String address,String data){
