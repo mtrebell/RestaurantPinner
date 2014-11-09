@@ -15,7 +15,7 @@ class MyAdapter extends FragmentPagerAdapter {
         Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = new MapFragment();
+                fragment = new MyMapFragment();
                 break;
             case 1:
                 fragment = new MarkerList();

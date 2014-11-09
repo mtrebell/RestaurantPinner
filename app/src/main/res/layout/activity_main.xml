@@ -12,15 +12,16 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:id="@+id/button_current"
-        android:text="@string/button_current_text"
+        android:id="@+id/action_filter"
+        android:text="@string/button_filter_text"
         android:padding="0dp"
         android:layout_marginLeft="-5dip"
         android:layout_marginRight="-5dip"
         android:layout_marginTop="-5dip"
         android:layout_marginBottom="-5dip"
         android:textColor="#ffffff"
-        android:background="#000000"/>
+        android:background="#000000"
+        android:onClick="onClick"/>
 </LinearLayout>
 
 

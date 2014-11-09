@@ -10,7 +10,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-
+import android.view.View;
 
 
 public class MainActivity extends FragmentActivity {
@@ -22,8 +22,8 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        fragmentManager = getFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
+        //fragmentManager = getFragmentManager();
+        //fragmentTransaction = fragmentManager.beginTransaction();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -48,6 +48,9 @@ public class MainActivity extends FragmentActivity {
         return true;
     }
 
+
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -71,22 +74,31 @@ public class MainActivity extends FragmentActivity {
         outState.putInt("index", i);
     }
 
+        private void onClick(View view){
+            switch ( view.getId()){
+                case R.id.action_filter:
+                    openFilter();
+            }
+
+        }
 
     private void openNewPin() {
         Intent addIntent = new Intent(this,NewPinActivity.class);
-        //Start Product Activity
         startActivity(addIntent);
     }
 
     private void openSearch() {
-        Intent notIntent = new Intent(this,SearchActivity.class);
-        //Start Product Activity
-        startActivity(notIntent);
+        Intent searchIntent = new Intent(this,SearchActivity.class);
+        startActivity(searchIntent);
+    }
+
+    private void openFilter() {
+        Intent filterIntent = new Intent(this,FilterActivity.class);
+        startActivity(filterIntent);
     }
 
     private void openNotification() {
         Intent notIntent = new Intent(this,Notification.class);
-        //Start Product Activity
         startActivity(notIntent);
     }
 
