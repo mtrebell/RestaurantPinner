@@ -80,13 +80,15 @@
         android:id="@+id/button_send"
         android:layout_weight=".5"
         android:layout_height="wrap_content"
-        android:text="@string/button_send_text" />
+        android:text="@string/button_send_text"
+        android:onClick="onClick"/>
 
     <Button
         android:id="@+id/button_clear"
         android:layout_weight=".5"
         android:layout_height="wrap_content"
-        android:text="@string/button_clear_text" />
+        android:text="@string/button_clear_text"
+        android:onClick="onClick"/>
     </TableRow>
 
 </TableLayout>

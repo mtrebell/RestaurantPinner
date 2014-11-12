@@ -13,6 +13,7 @@
     <string name="search_hintName">Restaurant Name Contains</string>
     <string name="title_activity_notification">Notifications</string>
     <string name="title_activity_search">Find a restaurant that:</string>
+    <string name="title_activity_filter">Find a restaurant that:</string>
     <string name="title_activity_addPin">Add Pin</string>
     <string name="button_clear_text">Clear</string>
     <string name="button_send_text">Submit</string>

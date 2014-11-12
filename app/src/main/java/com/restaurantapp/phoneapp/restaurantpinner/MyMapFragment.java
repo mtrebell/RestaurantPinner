@@ -2,15 +2,19 @@ package com.restaurantapp.phoneapp.restaurantpinner;
 
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,6 +25,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,13 +50,8 @@ public class MyMapFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    // TODO: Rename and change types and number of parameters
     public static MyMapFragment newInstance(String param1, String param2) {
         MyMapFragment fragment = new MyMapFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
         return fragment;
     }
 
@@ -64,9 +68,20 @@ public class MyMapFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.fragment_map, container, false);
         setMapTransparent((ViewGroup) view);
-        map = ((SupportMapFragment) getFragmentManager()
-                .findFragmentById(R.id.map)).getMap();
-        setUpMap();
+        if(map==null) {
+            map = ((SupportMapFragment) getFragmentManager()
+                    .findFragmentById(R.id.map)).getMap();
+            setUpMap();
+        }
+
+        //--------------------Build Markers here?----------------------
+        if(getArguments()!=null){
+            ArrayList<MarkerOptions> markers = getArguments().getParcelableArrayList("Markers");
+            if(markers!=null){
+                for(MarkerOptions marker :markers)
+                    map.addMarker(marker);
+            }
+        }
 
         return view;
     }
@@ -89,16 +104,7 @@ public class MyMapFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
@@ -125,19 +131,55 @@ public class MyMapFragment extends Fragment {
         else
              location = new LatLng(l.getLatitude(),l.getLongitude());
         CameraPosition cameraPosition = new CameraPosition.Builder()
-               .zoom(17)
+               .zoom(9)
               .target(location)
               .build();
 
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition cameraPosition) {
-                //check bounds
-            }
-        });
+        map.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) new MarkerClick());
     }
 
+    public class MarkerClick implements GoogleMap.OnMarkerClickListener{
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            final String uuid = marker.getSnippet();
+            final UserGrid usergrid= ((MyApplication)getActivity().getApplicationContext()).usergrid;
 
+            new AsyncTask<Void,Void,Bundle>() {
+                @Override
+                protected Bundle doInBackground(Void...voids) {
+
+                    JSONObject restraunt = usergrid.restaurantInfo(uuid);
+                    Log.d("Restraunt", restraunt.toString());
+                    Bundle bundle = new Bundle();
+                    bundle.putString("data",restraunt.toString());
+                    return bundle;
+                }
+
+                protected void onPostExecute(Bundle result) {
+                    showDialog(result);
+                }
+            }.execute();
+
+
+
+            //Show in dialong
+            //GRAB RESTRAUNT INFO
+           // new thread(){
+                //POPUP DIALOG WITH PINIT BUTTON
+                    //IF CLICKED SMALL DIALOG WITH PINTYPE POPS UP
+                        //IF RECCOMEND CLICKED SHOW A LIST OF FRIENDS
+            //if successful return true
+            //}
+            return true;
+        }
+    }
+
+    public void showDialog(Bundle data){
+        data.putInt("tab",0);
+        MarkerDialog dialog = new MarkerDialog(getActivity(),data);
+
+        dialog.show();
+    }
 
 }

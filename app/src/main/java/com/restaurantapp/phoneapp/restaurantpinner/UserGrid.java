@@ -1,6 +1,10 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
+import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,24 +26,21 @@ import org.json.JSONObject;
 
 public class UserGrid {
     private static String baseUrl;
-    String accessToken;
-    String uId;
+    private String accessToken;
+    private String uId;
 
     public UserGrid(String baseUrl){
-        //accessToken = null;
-        //uId=null;
+        accessToken = null;
+        uId=null;
         this.baseUrl = baseUrl;
     }
 
-    //query values account for values that need to be encoded
-
-    public UserGrid(String address,String org,String app){
-        baseUrl = address+'/'+org+'/'+app;
-        accessToken = null;
-        uId = null;
+    public UserGrid(String baseUrl,String uId,String accessToken){
+        this.accessToken = accessToken;
+        this.uId=uId;
+        this.baseUrl = baseUrl;
     }
 
-    //FIX THIS
     // Account Functions:
     public boolean login(String user,String password){
         String query = "/token?grant_type=password&username="+user+"&password="+password;
@@ -283,8 +284,8 @@ public class UserGrid {
 
     //Restaurant Functions:
 
-    //DO GEOCODING BEFORE HAND FOR ADDRESS VALUES OUTSIDE OF FUNCTION
-    public JSONObject restrauntSearch(String name,int lat,int lon,int km,boolean pinsOnly){
+    //Search by location name
+    public ArrayList<MarkerOptions>  restrauntSearch(String name,String address, Boolean pinsOnly){
         String entity;
         String query;
 
@@ -302,42 +303,89 @@ public class UserGrid {
             query+=" where name_index contains \'"+ name + "\'";
         }
 
+        //LOCATION HANDLING HERE
+
+        JSONObject response = sendGet(entity,query);
+        JSONArray data = null;
+        try {
+            data = response.getJSONArray("list");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return buildMarkers(data);
+    }
+
+
+    //Search location by lat lng
+    public ArrayList<MarkerOptions>  restrauntSearch(String name,double lat,double lon,double km,boolean pinsOnly){
+        String entity;
+        String query;
+        Log.d("Got a location",lat+" "+lon);
+
+        if(pinsOnly){
+            entity=uId+"/pin?ql=";
+            query="select uuid,name,location";
+        }
+        else{
+            entity="restaurants?ql=";
+            query= "select uuid,name,location";
+        }
+
+
+        if(!name.isEmpty()){
+            query+=" where name_index contains \'"+ name + "\'";
+        }
+
         if(lat !=-1){
-            if(name==null)
+            Log.d("Got here","Im here");
+            if(name.isEmpty())
                 query+=" where";
 
 
-            if(km!=-1) {
+            if(km!=-0) {
                 query += " location within " + km * 1000 + " of " + lat + ',' + lon;
             }
             //This accounts for tracking error
             else
                 query+=" location within 50 of \'" + lat + ',' + lon;
+            Log.d("query",query);
         }
 
         JSONObject response = sendGet(entity,query);
-
-        return response;
+        JSONArray data = null;
+        try {
+            data = response.getJSONArray("list");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+       return buildMarkers(data);
     }
 
-    public List<Marker>(JSONArray markers){
-      List<Marker> markerList=new ArrayList<Marker>();
+    public ArrayList<MarkerOptions> buildMarkers(JSONArray markers){
+      ArrayList<MarkerOptions> markerList=new ArrayList<MarkerOptions>();
       for(int i=0; i<markers.length(); i++) {
           JSONArray data = null;
           try {
               data = markers.getJSONArray(i);
 
-              Marker marker = new Marker({
-                      position: myLatlng,
-                      title:"uuid"});
+              String uuid = data.getString(0);
+              String name = data.getString(1);
 
-              marker.location = (new location(data[2].get("latitude"), data[2].get("longitude")))
-              marker.name = data[1];
-              marker.id = data[0]
+              JSONObject location = data.getJSONObject(2);
+              LatLng latlng = new LatLng(location.getDouble("latitude"),location.getDouble("longitude"));
+
+              MarkerOptions marker = new MarkerOptions()
+                      .position(latlng)
+                      .title(name)
+                      .snippet(uuid);
+              markerList.add(marker);
           } catch (JSONException e) {
               e.printStackTrace();
           }
       }
+
       return markerList;
       }
 
@@ -374,6 +422,18 @@ public class UserGrid {
         }catch(Exception e){
             return null;
         }
+    }
+
+    public String getUID(){
+        return uId;
+    }
+
+    public String getBaseUrl(){
+        return baseUrl;
+    }
+
+    public String getAccessToken(){
+        return accessToken;
     }
 
     public  JSONObject sendGet(String entity,String query){

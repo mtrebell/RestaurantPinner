@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+>
+
+    <TableRow>
+
+        <ImageView
+            android:id="@+id/pin"
+            android:layout_height="wrap_content"
+            />
+
+        <TextView
+            android:id="@+id/restraunt_name"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:textSize="20px"
+            />
+    </TableRow>
+
+    <TableRow>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:text="Address:"
+        />
+    <TextView
+        android:id="@+id/restraunt_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        />
+</TableRow>
+    <TableRow>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:text="PHONE:"
+            />
+
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:text="Hours"
+            />
+    <TextView
+        android:id="@+id/restraunt_hours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+    />
+    </TableRow>
+
+    <TableRow>
+    <Button
+        android:id="@+id/restraunt_add"
+        android:layout_width="100px"
+        android:layout_height="wrap_content"
+        android:text=" Pin It "
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_below="@+id/action_newpin"
+        android:layout_weight="0.5"
+        />
+        <Button
+            android:id="@+id/restraunt_close"
+            android:layout_width="100px"
+            android:layout_height="wrap_content"
+            android:text=" Pin It "
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_below="@+id/action_newpin"
+            android:layout_weight="0.5"
+            />
+    </TableRow>
+
+</TableLayout>

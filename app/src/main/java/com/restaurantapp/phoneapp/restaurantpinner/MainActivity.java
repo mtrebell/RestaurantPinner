@@ -5,39 +5,78 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.apache.commons.logging.Log;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends FragmentActivity {
 
-    FragmentManager fragmentManager;
-    FragmentTransaction fragmentTransaction;
-    PagerAdapter adapter;
+    MyAdapter adapter;
     ViewPager pager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //fragmentManager = getFragmentManager();
-        //fragmentTransaction = fragmentManager.beginTransaction();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+       // ArrayList<MarkerOptions> data = (ArrayList<MarkerOptions>) extras.get("markerList");
+
         adapter = new MyAdapter(getSupportFragmentManager());
+
+        Bundle extras = getIntent().getExtras();
+
+        if(extras!=null) {
+            if (extras.containsKey("Markers")) {
+                Toast.makeText(this, "Main got some data!", Toast.LENGTH_SHORT).show();
+                Bundle test = new Bundle();
+                test.putParcelableArrayList("Markers", extras.getParcelableArrayList("Markers"));
+                adapter.setData(test);
+            }
+            if(extras.get("Markers")!=null){
+                Toast.makeText(this,"Main got a marker array",Toast.LENGTH_SHORT).show();
+            }
+        }
+
 
         pager = (ViewPager)findViewById(R.id.pager);
         pager.setAdapter(adapter);
+        pager.setOffscreenPageLimit(4);
+
         addTabs();
 
         if(savedInstanceState != null) {
             int index = savedInstanceState.getInt("index");
             getActionBar().setSelectedNavigationItem(index);
         }
+
+        //Temp until figure out onClick bug
+        Button button = (Button) findViewById(R.id.action_filter);
+        button.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                openFilter();
+
+            }
+        });
+
     }
 
 
@@ -47,8 +86,6 @@ public class MainActivity extends FragmentActivity {
         getMenuInflater().inflate(R.menu.main_actions, menu);
         return true;
     }
-
-
 
 
     @Override
@@ -74,7 +111,7 @@ public class MainActivity extends FragmentActivity {
         outState.putInt("index", i);
     }
 
-        private void onClick(View view){
+        public void onClick(View view){
             switch ( view.getId()){
                 case R.id.action_filter:
                     openFilter();
@@ -92,7 +129,7 @@ public class MainActivity extends FragmentActivity {
         startActivity(searchIntent);
     }
 
-    private void openFilter() {
+    private void openFilter( ) {
         Intent filterIntent = new Intent(this,FilterActivity.class);
         startActivity(filterIntent);
     }
