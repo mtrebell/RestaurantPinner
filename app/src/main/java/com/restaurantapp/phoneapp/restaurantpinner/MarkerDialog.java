@@ -75,6 +75,16 @@ public class MarkerDialog extends Dialog {
                 dismiss();
             }
         });
+
+        btn = (Button)findViewById(R.id.restraunt_add);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle location = new Bundle();
+                //get lat,lng
+                //Start chose marker dialog
+            }
+        });
     }
 
 

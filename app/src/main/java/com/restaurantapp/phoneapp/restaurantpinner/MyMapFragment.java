@@ -3,6 +3,7 @@ package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -122,22 +124,25 @@ public class MyMapFragment extends Fragment {
         }
     }
 
-    public void setUpMap(){
+    public void setUpMap() {
         map.setMyLocationEnabled(true);
         Location l = map.getMyLocation();
         LatLng location;
-        if(l == null)
-             location = new LatLng(53.533,-113.5);
+        if (l == null)
+            location = new LatLng(53.533, -113.5);
         else
-             location = new LatLng(l.getLatitude(),l.getLongitude());
+            location = new LatLng(l.getLatitude(), l.getLongitude());
         CameraPosition cameraPosition = new CameraPosition.Builder()
-               .zoom(9)
-              .target(location)
-              .build();
+                .zoom(9)
+                .target(location)
+                .build();
 
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         map.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) new MarkerClick());
+        map.setOnMapLongClickListener(new LongClick());
     }
+
+
 
     public class MarkerClick implements GoogleMap.OnMarkerClickListener{
         @Override
@@ -175,6 +180,17 @@ public class MyMapFragment extends Fragment {
         }
     }
 
+    public class LongClick implements GoogleMap.OnMapLongClickListener{
+
+        @Override
+        public void onMapLongClick(LatLng latLng) {
+
+            Intent addIntent = new Intent(getActivity(),NewPinActivity.class);
+            addIntent.putExtra("lng",latLng.longitude);
+            addIntent.putExtra("lat", latLng.latitude);
+            startActivity(addIntent);
+        }
+    }
     public void showDialog(Bundle data){
         data.putInt("tab",0);
         MarkerDialog dialog = new MarkerDialog(getActivity(),data);

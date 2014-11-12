@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class UserGrid {
+    public final static String FAV = "fav", WISH="wishlist",REC="reccomend",LIKE="like",DIS="dislike";
     private static String baseUrl;
     private String accessToken;
     private String uId;
@@ -118,8 +119,8 @@ public class UserGrid {
         return true;
     }
 
-    public Map<String,String> getFriends(){
-        Map<String,String> friends = new HashMap<String,String>();
+    public HashMap<String,String> getFriends(){
+        HashMap<String,String> friends = new HashMap<String,String>();
         String entity = "users/"+uId+"/friend?ql=";
         String query = "select uuid,username,email";
         JSONObject response = sendGet(entity,query);
@@ -149,8 +150,8 @@ public class UserGrid {
         return users;
     }
 
-    public Map<String,String> userParse(JSONObject response){
-        Map<String,String> users = new HashMap<String,String>();
+    public HashMap<String,String> userParse(JSONObject response){
+        HashMap<String,String> users = new HashMap<String,String>();
         //PARSE STUFF HERE
         JSONArray friends = null;
         try {
@@ -205,27 +206,27 @@ public class UserGrid {
         JSONObject response = new JSONObject();
 
         try {
-        String entity ="users/"+uId+ "/like?ql=";
+        String entity ="users/"+uId+ "/"+LIKE+"?ql=";
         String query = "select uuid";
-        response.accumulate("like",  sendGet(entity,query));
+        response.accumulate(LIKE,  sendGet(entity,query));
 
-        entity ="users/"+uId+ "/favorite?ql=";
+        entity ="users/"+uId+ "/"+FAV+"?ql=";
         query = "select uuid";
 
-            response.accumulate("favorite", sendGet(entity, query));
+            response.accumulate( FAV, sendGet(entity, query));
 
 
-            entity = "users/" + uId + "/wishlist?ql=";
+            entity = "users/" + uId + "/"+WISH+"?ql=";
             query = "select uuid";
-            response.accumulate("wishlist", sendGet(entity, query));
+            response.accumulate(WISH, sendGet(entity, query));
 
-            entity = "users/" + uId + "/reccomend?ql=";
+            entity = "users/" + uId + "/"+REC+"?ql=";
             query = "select uuid";
-            response.accumulate("reccomend", sendGet(entity, query));
+            response.accumulate(REC, sendGet(entity, query));
 
-            entity = "users/" + uId + "/dislike?ql=";
+            entity = "users/" + uId + "/"+DIS+"?ql=";
             query = "select uuid";
-            response.accumulate("dislike", sendGet(entity, query));
+            response.accumulate(DIS, sendGet(entity, query));
         }catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -260,6 +261,19 @@ public class UserGrid {
         return pins;
     }
 
+
+    public boolean addPin(String restraunt, String pinType){
+        //to quickly grab all pins
+        String query;
+        //Specific Type, allows user filters to be added later on
+
+            query = "/users/" +uId +"/"+ pinType + "/" + restraunt+"?access_token="+accessToken;
+            request(query,"POST");
+
+        return true;
+    }
+
+
     public boolean addPin(String restraunt,List<String> pinType){
         //to quickly grab all pins
         String query;
@@ -279,6 +293,30 @@ public class UserGrid {
             String query = "/users/" +uId +"/"+ pin + "/" + restraunt+"?access_token="+accessToken;
             request(query,"DELETE");
         }
+        return true;
+    }
+
+
+    public boolean addRecomendation(String restraunt, String user){
+        //to quickly grab all pins
+        String query;
+        //Specific Type, allows user filters to be added later on
+
+        query = "/users/" +user +"/rec"+ uId + "/" + restraunt+"?access_token="+accessToken;
+        request(query,"POST");
+
+        return true;
+    }
+
+
+    public boolean removeRecomendation(String restraunt, String user){
+        //to quickly grab all pins
+        String query;
+        //Specific Type, allows user filters to be added later on
+
+        query = "/users/" +user +"/rec"+ uId + "/" + restraunt+"?access_token="+accessToken;
+        request(query,"DELETE");
+
         return true;
     }
 
@@ -348,11 +386,12 @@ public class UserGrid {
             }
             //This accounts for tracking error
             else
-                query+=" location within 50 of \'" + lat + ',' + lon;
+                query+=" location within 750 of " + lat + ',' + lon;
             Log.d("query",query);
         }
 
         JSONObject response = sendGet(entity,query);
+        Log.d("Response",response.toString());
         JSONArray data = null;
         try {
             data = response.getJSONArray("list");
@@ -364,6 +403,7 @@ public class UserGrid {
     }
 
     public ArrayList<MarkerOptions> buildMarkers(JSONArray markers){
+
       ArrayList<MarkerOptions> markerList=new ArrayList<MarkerOptions>();
       for(int i=0; i<markers.length(); i++) {
           JSONArray data = null;

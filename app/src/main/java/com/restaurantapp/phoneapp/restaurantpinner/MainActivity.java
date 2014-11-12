@@ -1,8 +1,10 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -120,8 +122,18 @@ public class MainActivity extends FragmentActivity {
         }
 
     private void openNewPin() {
-        Intent addIntent = new Intent(this,NewPinActivity.class);
-        startActivity(addIntent);
+        new AlertDialog.Builder(this)
+                .setTitle("Add Pin")
+                .setMessage("To add a pin tap and hold any location on the map")
+                .setPositiveButton("Use Current", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // get current location
+                    }
+                })
+                .setIcon(android.R.drawable.ic_input_add)
+                .show();
+        //Intent addIntent = new Intent(this,NewPinActivity.class);
+        //startActivity(addIntent);
     }
 
     private void openSearch() {

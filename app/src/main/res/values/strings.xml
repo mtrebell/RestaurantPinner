@@ -22,5 +22,8 @@
     <string name="distance">Within X kms:</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="button_filter_text">Filter</string>
+    <string name="toggle_turn_on">"-"</string>
+    <string name="toggle_turn_off">"+"</string>
+    <string name="title_activity_marker_confirm">MarkerConfirm</string>
 
 </resources>
