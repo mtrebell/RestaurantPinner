@@ -155,7 +155,6 @@ public class MyMapFragment extends Fragment {
                 protected Bundle doInBackground(Void...voids) {
 
                     JSONObject restraunt = usergrid.restaurantInfo(uuid);
-                    Log.d("Restraunt", restraunt.toString());
                     Bundle bundle = new Bundle();
                     bundle.putString("data",restraunt.toString());
                     return bundle;
@@ -193,7 +192,7 @@ public class MyMapFragment extends Fragment {
     }
     public void showDialog(Bundle data){
         data.putInt("tab",0);
-        MarkerDialog dialog = new MarkerDialog(getActivity(),data);
+        MarkerDialog dialog = new MarkerDialog(getActivity(),data,getActivity());
 
         dialog.show();
     }

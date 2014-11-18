@@ -120,6 +120,7 @@ public class UserGrid {
     }
 
     public HashMap<String,String> getFriends(){
+        Log.d("ADD PIN","Searching for frineds....");
         HashMap<String,String> friends = new HashMap<String,String>();
         String entity = "users/"+uId+"/friend?ql=";
         String query = "select uuid,username,email";
@@ -198,89 +199,89 @@ public class UserGrid {
 
     //Pin Functions:
 
-    //for filtering
-    //This should be called on successful login
-    //Map<pinType,Restaurants>
-    public Map<String,List<String>> getPinsFilter(){
-        Map<String,List<String>> pins = new HashMap<String,List<String>>();
+    public JSONObject getPinInfo(){
         JSONObject response = new JSONObject();
-
         try {
-        String entity ="users/"+uId+ "/"+LIKE+"?ql=";
-        String query = "select uuid";
-        response.accumulate(LIKE,  sendGet(entity,query));
+            String entity ="users/"+uId+ "/"+LIKE+"?ql=";
+            String query = "select uuid,name";
+            response.accumulate(LIKE,  sendGet(entity,query));
 
-        entity ="users/"+uId+ "/"+FAV+"?ql=";
-        query = "select uuid";
+            entity ="users/"+uId+ "/"+FAV+"?ql=";
+            query = "select uuid,name";
 
             response.accumulate( FAV, sendGet(entity, query));
 
 
             entity = "users/" + uId + "/"+WISH+"?ql=";
-            query = "select uuid";
+            query = "select uuid,name";
             response.accumulate(WISH, sendGet(entity, query));
 
             entity = "users/" + uId + "/"+REC+"?ql=";
-            query = "select uuid";
+            query = "select uuid,name";
             response.accumulate(REC, sendGet(entity, query));
 
             entity = "users/" + uId + "/"+DIS+"?ql=";
-            query = "select uuid";
+            query = "select uuid,name,loc";
             response.accumulate(DIS, sendGet(entity, query));
         }catch (JSONException e) {
             e.printStackTrace();
             return null;
         }
-        //Parse funcition
-        //To a Map of filtering data
-        Iterator<String> keys = response.keys();
+        return response;
+    }
+
+    //Returns all users pins <uuid,name>
+    public HashMap<String, Pin> getPins(){
+        HashMap<String,Pin> pins = new HashMap<String,Pin>();
+        JSONObject data = getPinInfo();
+
+        Iterator<String> keys = data.keys();
 
         while(keys.hasNext()){
             String key = keys.next();
-            JSONArray restraunts = null;
+            JSONArray restraunts;
             try {
-                restraunts = (JSONArray)((JSONObject) response.get(key)).get("entities");
+                restraunts = (JSONArray)((JSONObject) data.get(key)).get("entities");
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
-            List<String> list =new ArrayList<String>();
+
             for(int i=0;i<restraunts.length();i++){
                 try {
-                    list.add(((JSONObject)restraunts.get(i)).getString("uuid"));
+                    String uuid = ((JSONObject)restraunts.get(i)).getString("uuid");
+                    String name = ((JSONObject)restraunts.get(i)).getString("name");
+                    double lat = ((JSONObject)restraunts.get(i)).getDouble("latitude");
+                    double lng = ((JSONObject)restraunts.get(i)).getDouble("longitude");
+
+                    //Update old data
+                    if(!pins.containsKey(uuid)) {
+                        Pin pin = pins.get(key);
+                        pin.types.add(key);
+                        pins.put(uuid, pin);
+                    }
+                    //Create new
+                    else
+                        pins.put(uuid,new Pin(uuid,name,lat,lng));
                 } catch (JSONException e) {
                     e.printStackTrace();
                     return null;
                 }
             }
-
-            if(!list.isEmpty())
-                pins.put(key, list);
         }
 
         return pins;
     }
 
-
-    public boolean addPin(String restraunt, String pinType){
-        //to quickly grab all pins
-        String query;
-        //Specific Type, allows user filters to be added later on
-
-            query = "/users/" +uId +"/"+ pinType + "/" + restraunt+"?access_token="+accessToken;
-            request(query,"POST");
-
-        return true;
-    }
-
-
     public boolean addPin(String restraunt,List<String> pinType){
         //to quickly grab all pins
+        Log.d("ADD PIN","ADDING PIN....");
         String query;
         //Specific Type, allows user filters to be added later on
         for(String pin:pinType) {
             query = "/users/" +uId +"/"+ pin + "/" + restraunt+"?access_token="+accessToken;
-            request(query,"POST");
+            Log.d("ADD PIN",query);
+            request(query, "PUT");
         }
         return true;
     }
@@ -288,6 +289,8 @@ public class UserGrid {
     //In phoneApp check if completely removed add pin to list if it is
     //Also for dislike only allow dislike pin(Later Feature)
     public boolean removePin(String restraunt,List<String> pinType){
+        if(pinType==null)
+            return false;
 
         for(String pin:pinType) {
             String query = "/users/" +uId +"/"+ pin + "/" + restraunt+"?access_token="+accessToken;
@@ -297,14 +300,19 @@ public class UserGrid {
     }
 
 
-    public boolean addRecomendation(String restraunt, String user){
+    public boolean addRecomendation(String restraunt, List<String> users){
         //to quickly grab all pins
         String query;
         //Specific Type, allows user filters to be added later on
+        Log.d("Adding the pin.....","recomendation");
+        if(users == null)
+            return false;
 
-        query = "/users/" +user +"/rec"+ uId + "/" + restraunt+"?access_token="+accessToken;
-        request(query,"POST");
-
+        for(String user: users) {
+            query = "/users/" + user + "/recnotice/" + restraunt + "?access_token=" + accessToken;
+            Log.d("Adding the pin.....","query");
+            request(query, "PUT");
+        }
         return true;
     }
 
@@ -314,7 +322,7 @@ public class UserGrid {
         String query;
         //Specific Type, allows user filters to be added later on
 
-        query = "/users/" +user +"/rec"+ uId + "/" + restraunt+"?access_token="+accessToken;
+        query = "/users/" +user +"/recnotice/" + restraunt+"?access_token="+accessToken;
         request(query,"DELETE");
 
         return true;
@@ -351,6 +359,7 @@ public class UserGrid {
             e.printStackTrace();
             return null;
         }
+
         return buildMarkers(data);
     }
 
@@ -425,7 +434,7 @@ public class UserGrid {
               e.printStackTrace();
           }
       }
-
+        Log.d("I got",markerList.toString());
       return markerList;
       }
 
@@ -456,6 +465,7 @@ public class UserGrid {
         URL obj;
         try {
             obj = new URL(baseUrl + query);
+            Log.d("Query",obj.toString());
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod(method);
             return con.getResponseMessage();

@@ -1,7 +1,9 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -13,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,9 +24,13 @@ import org.json.JSONObject;
  */
 public class MarkerDialog extends Dialog {
     Bundle info;
-    public MarkerDialog(Context context,Bundle info) {
-        super(context);
+    JSONObject restaurant;
+    Activity parent;
+
+    public MarkerDialog(Context context,Bundle info,Activity parent) {
+        super(context,android.R.style.Theme_Holo_Dialog);
         this.info=info;
+        this.parent=parent;
     }
 
     public MarkerDialog(Context context, int theme) {
@@ -36,26 +43,45 @@ public class MarkerDialog extends Dialog {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        requestWindowFeature(Window.FEATURE_LEFT_ICON);
         super.onCreate(savedInstanceState);
 
         View view = getWindow().getDecorView();
         WindowManager.LayoutParams lp = (WindowManager.LayoutParams) view.getLayoutParams();
 
         setContentView(R.layout.dialog_marker);
-        TextView name = (TextView) findViewById(R.id.restraunt_name);
+
+        TextView phone = (TextView) findViewById(R.id.restraunt_phone);
         TextView address = (TextView) findViewById(R.id.restraunt_address);
         TextView hours = (TextView) findViewById(R.id.restraunt_hours);
-        ImageView pin = (ImageView) findViewById(R.id.pin);
-        //Set all the fields
+
         if (info != null) {
             try {
-                JSONObject restaurant = new JSONObject(info.getString("data"));
-                name.setText(restaurant.getString("name"));
-                address.setText(restaurant.getJSONArray("address").toString());
-                hours.setText(restaurant.getJSONArray("hours").toString());
-                pin.setImageResource(R.drawable.ic_action_newpin);
+
+                restaurant = new JSONObject(info.getString("data"));
+
+                this.setTitle(restaurant.getString("name"));
+                setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.ic_action_newpin);
+
+                StringBuilder sb = new StringBuilder();
+                JSONArray add = restaurant.getJSONArray("address");
+                for(int i=0;i<add.length();i++){
+                    sb.append(add.getString(i));
+                    sb.append(" ");
+                }
+                address.setText(sb.toString());
+
+                sb = new StringBuilder();
+                JSONArray hour = restaurant.getJSONArray("hours");
+                for(int i=0;i<hour.length();i++){
+                    sb.append(hour.getString(i));
+                    sb.append(" ");
+                }
+                hours.setText(sb.toString());
+
+                phone.setText(restaurant.getString("phone"));
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -81,8 +107,16 @@ public class MarkerDialog extends Dialog {
             @Override
             public void onClick(View view) {
                 Bundle location = new Bundle();
-                //get lat,lng
-                //Start chose marker dialog
+                if(restaurant!=null) {
+                    Intent addIntent = new Intent(parent,NewPinActivity.class);
+                    try {
+                        addIntent.putExtra("restaurant", restaurant.getString("uuid"));
+                        parent.startActivity(addIntent);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
             }
         });
     }

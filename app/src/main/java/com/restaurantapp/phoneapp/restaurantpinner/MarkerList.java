@@ -25,19 +25,6 @@ import java.util.ArrayList;
 
 public class MarkerList extends ListFragment {
 
-    String[] testData = new String[] {
-            "India",
-            "Pakistan",
-            "Sri Lanka",
-            "China",
-            "Bangladesh",
-            "Nepal",
-            "Afghanistan",
-            "North Korea",
-            "South Korea",
-            "Japan"
-    };
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         MarkerAdapter adapter = new MarkerAdapter(inflater.getContext(), android.R.layout.simple_list_item_1);
@@ -81,7 +68,7 @@ public class MarkerList extends ListFragment {
     public void showDialog(Bundle data){
         data.putInt("tab",1);
         getActivity().getActionBar().setSelectedNavigationItem(0);
-        MarkerDialog dialog = new MarkerDialog(getActivity(),data);
+        MarkerDialog dialog = new MarkerDialog(getActivity(),data,getActivity());
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
