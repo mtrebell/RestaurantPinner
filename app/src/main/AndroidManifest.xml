@@ -64,8 +64,8 @@
             android:theme="@android:style/Theme.Holo.Light.DarkActionBar" >
         </activity>
         <activity
-            android:name="com.restaurantapp.phoneapp.restaurantpinner.PinActivity"
-            android:label="@string/title_activity_pin" >
+            android:name="com.restaurantapp.phoneapp.restaurantpinner.LoginActivity"
+            android:label="@string/title_activity_login" >
         </activity>
     </application>
 
