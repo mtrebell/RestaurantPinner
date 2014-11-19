@@ -44,9 +44,12 @@ public class UserGrid {
 
     // Account Functions:
     public boolean login(String user,String password){
-        String query = "/token?grant_type=password&username="+user+"&password="+password;
-        JSONObject response = sendGet(query,null);
+        String query = "token?grant_type=password&username="+user+"&password="+password;
+
         try{
+            JSONObject response = sendGet(query,null);
+            if(response == null)
+                return false;
             accessToken = response.getString("access_token");
             uId = response.getJSONObject("user").getString("uuid");
         }catch(JSONException e){
@@ -511,11 +514,11 @@ public class UserGrid {
             }
             JSONObject results;
             try {
-
+                System.out.println(encodedURL);
                 InputStreamReader in = new InputStreamReader(con.getInputStream());
                 results= readStream(new BufferedReader(in));
             } catch (IOException e) {
-                System.out.println("No response");
+                System.out.println("No response  url: " + encodedURL);
                 return null;
             } catch (JSONException e) {
                 e.printStackTrace();

@@ -19,4 +19,9 @@
         android:title="@string/action_notification"
         android:showAsAction="always"/>
 
+    <item android:id="@+id/action_login"
+        android:icon="@drawable/ic_button"
+        android:title="Login"
+        android:showAsAction="always"/>
+
 </menu>

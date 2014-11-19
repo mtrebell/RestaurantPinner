@@ -88,6 +88,9 @@ public class MainActivity extends FragmentActivity {
             case R.id.action_newpin:
                 openNewPin();
                 return true;
+            case R.id.action_login:
+                openLogin();
+                return true;
             case R.id.action_notification:
                 openNotification();
             default:
@@ -146,6 +149,11 @@ public class MainActivity extends FragmentActivity {
     private void openFilter( ) {
         Intent filterIntent = new Intent(this,FilterActivity.class);
         startActivity(filterIntent);
+    }
+
+    private void openLogin() {
+        Intent loginIntent = new Intent(this,LoginActivity.class);
+        startActivity(loginIntent);
     }
 
     private void openNotification() {
