@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.restaurantapp.phoneapp.restaurantpinner" >
 
+    <uses-sdk
+        android:minSdkVersion="15"
+        android:targetSdkVersion="20" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -66,6 +70,10 @@
         <activity
             android:name="com.restaurantapp.phoneapp.restaurantpinner.PinActivity"
             android:label="@string/title_activity_pin" >
+        </activity>
+        <activity
+            android:name="com.restaurantapp.phoneapp.restaurantpinner.FriendActivity"
+            android:label="@string/title_activity_friend" >
         </activity>
     </application>
 

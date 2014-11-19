@@ -144,7 +144,7 @@ public class UserGrid {
 
     public Map<String,String> searchUser(String username){
         Map<String,String> users = new HashMap<String,String>();
-        String entity ="users?ql=";
+        String entity ="/users?ql=";
         String query = "select uuid,username,email where username= '"+username + "*'";
         JSONObject response = sendGet(entity,query);
         users = userParse(response);
@@ -155,6 +155,7 @@ public class UserGrid {
         HashMap<String,String> users = new HashMap<String,String>();
         //PARSE STUFF HERE
         JSONArray friends = null;
+
         try {
             friends = (JSONArray)response.get("list");
         } catch (JSONException e) {
@@ -202,25 +203,25 @@ public class UserGrid {
     public JSONObject getPinInfo(){
         JSONObject response = new JSONObject();
         try {
-            String entity ="users/"+uId+ "/"+LIKE+"?ql=";
+            String entity ="/users/"+uId+ "/"+LIKE+"?ql=";
             String query = "select uuid,name";
             response.accumulate(LIKE,  sendGet(entity,query));
 
-            entity ="users/"+uId+ "/"+FAV+"?ql=";
+            entity ="/users/"+uId+ "/"+FAV+"?ql=";
             query = "select uuid,name";
 
             response.accumulate( FAV, sendGet(entity, query));
 
 
-            entity = "users/" + uId + "/"+WISH+"?ql=";
+            entity = "/users/" + uId + "/"+WISH+"?ql=";
             query = "select uuid,name";
             response.accumulate(WISH, sendGet(entity, query));
 
-            entity = "users/" + uId + "/"+REC+"?ql=";
+            entity = "/users/" + uId + "/"+REC+"?ql=";
             query = "select uuid,name";
             response.accumulate(REC, sendGet(entity, query));
 
-            entity = "users/" + uId + "/"+DIS+"?ql=";
+            entity = "/users/" + uId + "/"+DIS+"?ql=";
             query = "select uuid,name,loc";
             response.accumulate(DIS, sendGet(entity, query));
         }catch (JSONException e) {
@@ -275,13 +276,13 @@ public class UserGrid {
 
     public boolean addPin(String restraunt,List<String> pinType){
         //to quickly grab all pins
-        Log.d("ADD PIN","ADDING PIN....");
         String query;
+
         //Specific Type, allows user filters to be added later on
         for(String pin:pinType) {
-            query = "/users/" +uId +"/"+ pin + "/" + restraunt+"?access_token="+accessToken;
+            query = "/users/" +uId +"/"+ pin + "/restaurants/" + restraunt+"?access_token="+accessToken;
             Log.d("ADD PIN",query);
-            request(query, "PUT");
+            Log.d("RESULT",request(query, "POST").toString());
         }
         return true;
     }
@@ -293,7 +294,7 @@ public class UserGrid {
             return false;
 
         for(String pin:pinType) {
-            String query = "/users/" +uId +"/"+ pin + "/" + restraunt+"?access_token="+accessToken;
+            String query = "/users/" +uId +"/"+ pin + "/restaurants/" + restraunt+"?access_token="+accessToken;
             request(query,"DELETE");
         }
         return true;
@@ -349,8 +350,6 @@ public class UserGrid {
             query+=" where name_index contains \'"+ name + "\'";
         }
 
-        //LOCATION HANDLING HERE
-
         JSONObject response = sendGet(entity,query);
         JSONArray data = null;
         try {
@@ -375,7 +374,7 @@ public class UserGrid {
             query="select uuid,name,location";
         }
         else{
-            entity="restaurants?ql=";
+            entity="/restaurants?ql=";
             query= "select uuid,name,location";
         }
 
@@ -418,8 +417,9 @@ public class UserGrid {
           JSONArray data = null;
           try {
               data = markers.getJSONArray(i);
-
+              Log.d("DATA",data.toString());
               String uuid = data.getString(0);
+              Log.d("GOT UUID",uuid);
               String name = data.getString(1);
 
               JSONObject location = data.getJSONObject(2);
@@ -439,7 +439,7 @@ public class UserGrid {
       }
 
     public JSONObject restaurantInfo(String restrauntID){
-        String entity = "restaurants?ql=";
+        String entity = "/restaurants?ql=";
         String query = "select * where uuid="+restrauntID;
         JSONObject response=sendGet(entity,query);
 
