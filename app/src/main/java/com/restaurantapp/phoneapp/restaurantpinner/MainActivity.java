@@ -2,29 +2,18 @@ package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.apache.commons.logging.Log;
-
-import java.util.ArrayList;
 
 
 public class MainActivity extends FragmentActivity {
@@ -127,7 +116,20 @@ public class MainActivity extends FragmentActivity {
                 .setMessage("To add a pin tap and hold any location on the map")
                 .setPositiveButton("Use Current", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // get current location
+                        new AsyncTask<Void, Void, double[]>() {
+
+                            @Override
+                            protected double[] doInBackground(Void... voids) {
+                                Geocode geocoder = new Geocode(MainActivity.this);
+                                double[] loc = geocoder.getLocation();
+                                return loc;
+                            }
+
+                            @Override
+                            protected void onPostExecute(double[] result) {
+                                openNewPin(result);
+                            }
+                        }.execute();
                     }
                 })
                 .setIcon(android.R.drawable.ic_input_add)
@@ -149,6 +151,13 @@ public class MainActivity extends FragmentActivity {
     private void openNotification() {
         Intent notIntent = new Intent(this,Notification.class);
         startActivity(notIntent);
+    }
+
+    private  void openNewPin(double[] loc){
+        Intent newIntent = new Intent(this,NewPinActivity.class);
+        newIntent.putExtra("lat",loc[0]);
+        newIntent.putExtra("lng",loc[1]);
+        startActivity(newIntent);
     }
 
     private void addTabs(){

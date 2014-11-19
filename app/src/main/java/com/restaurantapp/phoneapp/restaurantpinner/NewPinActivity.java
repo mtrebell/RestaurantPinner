@@ -13,30 +13,25 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class NewPinActivity extends Activity {
+
     double lat=-1;
     double lng=-1;
 
@@ -48,21 +43,24 @@ public class NewPinActivity extends Activity {
 
     List<String> types;
     private String uuid;
+    UserGrid usergrid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_pin);
+        setContentView(R.layout.activity_new_pin); //Change this view
         types = new ArrayList<String>();
         buildButtons();
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if(extras!=null){
-            Toast.makeText(this,"I got the data!!!",Toast.LENGTH_SHORT);
-            lat=extras.getDouble("lat");
-            lng=extras.getDouble("lng");
+         uuid = extras.getString("restaurant");
+         lat=extras.getDouble("lat");
+         lng=extras.getDouble("lng");
         }
+
+        usergrid= ((MyApplication)getApplicationContext()).usergrid;
     }
 
 
@@ -90,55 +88,76 @@ public class NewPinActivity extends Activity {
         switch(v.getId()){
             //case R.id.button_current:
             case R.id.button_clear:
-                cancel();
+                endTask();
             case R.id.button_send:
                 submit();
         }
     }
 
-    public void cancel(){
-        Intent i = new Intent(this,MainActivity.class);
-        startActivity(i);
+
+    public void submit() {
+        Log.d("Trying to sumbit","------------");
+
+        final UserGrid usergrid = ((MyApplication) getApplicationContext()).usergrid;
+
+        if (fav.isChecked())
+            types.add(UserGrid.FAV);
+        if (fav.isChecked())
+            types.add(UserGrid.WISH);
+        if (fav.isChecked())
+            types.add(UserGrid.LIKE);
+        if (fav.isChecked())
+            types.add(UserGrid.DIS);
+
+        if (types.isEmpty() && !rec.isChecked()) {
+            Log.d("TYPES", "NO TYPES SELECTED");
+            endTask();
+        }
+
+        else {
+
+            if (uuid != null) {
+                Log.d("GOT UUID", uuid);
+                if (rec.isChecked())
+                    getFriends();
+                else
+                    addPin(null);
+
+            }
+
+            //Build pin list
+            else {
+                new AsyncTask<Void, Void, ArrayList<MarkerOptions>>() {
+                    @Override
+                    protected ArrayList<MarkerOptions> doInBackground(Void... voids) {
+                        Log.d("Finding Restraunts","------------");
+                        if (lat == -1) {
+                            //ERROR MESSAGE
+                            return null;
+                        }
+
+                        ArrayList<MarkerOptions> restaurant = usergrid.restrauntSearch("", lat, lng, 0, false);
+
+                        return restaurant;
+                    }
+
+                    protected void onPostExecute(ArrayList<MarkerOptions> result) {
+                        launchConfirm(result);
+                    }
+                }.execute();
+
+            }
+        }
     }
 
-
-    public void submit(){
-
-        final UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
-
-    //Build pin list
-        new AsyncTask<Void,Void,ArrayList<MarkerOptions> >() {
-            @Override
-            protected ArrayList<MarkerOptions> doInBackground(Void...voids) {
-                if(fav.isChecked())
-                    types.add(UserGrid.FAV);
-                if(fav.isChecked())
-                    types.add(UserGrid.WISH);
-                if(fav.isChecked())
-                    types.add(UserGrid.LIKE);
-                if(fav.isChecked())
-                    types.add(UserGrid.DIS);
-
-                if(types.isEmpty() && !rec.isChecked()){
-                    Log.d("TYPES","NO TYPES SELECTED");
-                    return null;
-                }
-
-                if(lat==-1) {
-                        //ERROR MESSAGE
-                        return null;
-                }
-
-                ArrayList<MarkerOptions> restaurant = usergrid.restrauntSearch("",lat,lng,0,false);
-
-                return restaurant;
-            }
-
-            protected void onPostExecute(ArrayList<MarkerOptions> result) {
-                onComplete(result);
-            }
-        }.execute();
-
+    public void launchConfirm(ArrayList<MarkerOptions> restraunts){
+        if (restraunts==null || restraunts.isEmpty()){
+            Toast toast = Toast.makeText(this, "Could not find any restraunts", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+        else
+            new ConfirmDialog(restraunts,this);
     }
 
     public void buildButtons(){
@@ -151,59 +170,58 @@ public class NewPinActivity extends Activity {
 
     //load confirmdialog
     //addPin
-    public void onComplete(final ArrayList<MarkerOptions> restraunts) {
+    public void getFriends() {
 
-        if(restraunts==null)
-            return;
+        //Add Recomendations
+    if(rec.isChecked()){
+        new AsyncTask<Void,Void,HashMap<String,String>>(){
 
-        if (restraunts.isEmpty()){
-        Toast toast = Toast.makeText(this, "Could not find any restraunts", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-        }
-        else {
-            ConfirmDialog dialog = new ConfirmDialog(restraunts, this);
+            @Override
+            protected HashMap<String, String> doInBackground(Void... voids) {
+                HashMap<String,String> friends = usergrid.getFriends();
+                return friends;
+            }
 
-            final UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
-
-            new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-
-                        //Add Recomendations
-                        if(rec.isChecked()){
-                            HashMap<String,String> friends =usergrid.getFriends();
-                            if(friends!=null) {
-                                getFriendsDialog(friends.keySet());
-                            }
-
-                            //choose friend(s)
-                            //usergrid.addRecomendation();
-                        }
-
-                        //Add other pins
-                        if(!types.isEmpty())
-                            usergrid.addPin(uuid, types);
-
-                        return null;
-
+            protected void onPostExecute(HashMap<String,String> results){
+                if(results!=null){
+                    new FriendsDialog(results,NewPinActivity.this);
                 }
-
-                protected void onPostExecute(Void v){
-                    endTask();
+                else {
+                    Toast msg = Toast.makeText(NewPinActivity.this,"No Friends found",Toast.LENGTH_SHORT);
+                    //Add pin to the map.
+                     addPin(null);
                 }
-            };
-                }
+            }
+        }.execute();
+       }
+}
 
-            //Done start new activity
+    public void addPin(List<String> friends){
+        new AsyncTask<List<String>,Void,Void>() {
 
-        }
+            @Override
+            protected Void doInBackground(List<String>... prams) {
+                Log.d("Adding pin","------------");
+                List<String> friends = prams[0];
+                if(friends!=null && !friends.isEmpty())
+                    usergrid.addRecomendation(uuid,friends);
+                if(!types.isEmpty())
+                    usergrid.addPin(uuid,types);
+                return null;
+            }
 
-    private void getFriendsDialog(Set<String> strings) {
+            protected void onPostExecute(Void voids) {
+                //OnCopmlete close windows.....
+                endTask();
+            }
 
+        }.execute(friends);
     }
 
     private void endTask() {
+        uuid =null;
+        lat=-1;
+        lng=-1;
         Intent openMainActivity= new Intent(this, MainActivity.class);
         openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(openMainActivity);
@@ -215,29 +233,33 @@ public class NewPinActivity extends Activity {
     public class ConfirmDialog{
         MarkerAdapter adapter;
         ListView lv;
-        public MarkerOptions item;
+        public int selected =0;
 
         public ConfirmDialog(ArrayList<MarkerOptions> restaurants,Context context) {
-            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(NewPinActivity.this);
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
             LayoutInflater inflater = getLayoutInflater();
             View convertView = (View) inflater.inflate(R.layout.fragment_item_list, null);
             alertDialog.setView(convertView);
             alertDialog.setTitle("Confirm Restaurant");
+
             alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    uuid = item.getSnippet();
+                    uuid = adapter.getItem(selected).getSnippet();
+                    Log.d("GOT UUID",uuid);
+                    setuuid(uuid);
+
                 }
             });
+
             alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    cancel();
+                    endTask();
                 }
             });
 
             lv = (ListView) convertView.findViewById(R.id.list);
-            lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
             adapter = new MarkerAdapter(context, android.R.layout.simple_list_item_1, restaurants);
             lv.setAdapter(adapter);
@@ -245,15 +267,73 @@ public class NewPinActivity extends Activity {
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
-                    lv.setItemChecked(position, true);
-                    item = (MarkerOptions) adapter.getItem(position);
-                    //highlight
-                    adapter.notifyDataSetChanged();
+                    selected = position;
+                    Log.d("SELECTED",""+position);
                 }
             });
 
-            lv.setSelection(0);
             alertDialog.show();
         }
     }
+
+    public class FriendsDialog {
+        HashMapAdapter adapter;
+        ListView lv;
+        public int selected;
+        String username;
+        List<String> friends;
+
+        public FriendsDialog(HashMap<String,String> users,Context context) {
+            friends = new ArrayList<String>();
+
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+            LayoutInflater inflater = getLayoutInflater();
+            View convertView = (View) inflater.inflate(R.layout.fragment_item_list, null);
+            alertDialog.setView(convertView);
+            alertDialog.setTitle("Choose Friend(s)");
+
+            alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    addPin(friends);
+                }
+
+            });
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    endTask();
+                }
+            });
+
+            lv = (ListView) convertView.findViewById(R.id.list);
+            lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
+                    String friend = adapter.getItem(position);
+                    if(friends.contains(friend))
+                        friends.remove(friend);
+                    else
+                        friends.add(friend);
+                }
+            });
+
+            adapter = new HashMapAdapter(users);
+            lv.setAdapter(adapter);
+
+            alertDialog.show();
+        }
+
+    }
+
+    public void setuuid(String uuid){
+        this.uuid=uuid;
+        if (rec.isChecked())
+            getFriends();
+        else
+            addPin(null);
+    }
+
 }

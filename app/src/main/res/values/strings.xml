@@ -25,5 +25,7 @@
     <string name="toggle_turn_on">"-"</string>
     <string name="toggle_turn_off">"+"</string>
     <string name="title_activity_marker_confirm">MarkerConfirm</string>
+    <string name="title_activity_pin">PinActivity</string>
+    <string name="title_activity_friend">FriendActivity</string>
 
 </resources>

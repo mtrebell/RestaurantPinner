@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -43,6 +44,7 @@ public class SearchActivity extends Activity {
         final TextView seekBarValue = (TextView) findViewById(R.id.seekbar_value);
         SeekListner seekListner = new SeekListner(seekBarValue);
         seekBar.setOnSeekBarChangeListener(seekListner);
+
     }
 
 
@@ -71,9 +73,15 @@ public class SearchActivity extends Activity {
         switch (view.getId()) {
             case R.id.button_clear:
                 clear();
+                break;
 
             case R.id.button_send:
                 submit();
+                break;
+
+            case R.id.button_current:
+                getLoc();
+                break;
         }
     }
 
@@ -90,6 +98,31 @@ public class SearchActivity extends Activity {
         //set slider
         SeekBar seekBar = (SeekBar) findViewById(R.id.seekbar);
         seekBar.setProgress(20);
+    }
+
+    private  void getLoc(){
+        final Geocode geocoder = new Geocode(this);
+
+        new AsyncTask<Void,Void,String>(){
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                double[] loc = geocoder.getLocation();
+                return geocoder.reverseGeocode(loc[0],loc[1]);
+            }
+
+            @Override
+            protected void onPostExecute(String address) {
+                updateLocation(address);
+            }
+        }.execute();
+
+
+    }
+    public void updateLocation(String address){
+        //update textbox
+        EditText text = (EditText) findViewById(R.id.searchLoc);
+        text.setText(address);
     }
 
     private void submit() {
@@ -110,7 +143,7 @@ public class SearchActivity extends Activity {
                     //GEOCODE LOCATION HERE
                     if (location != "" && lat == -1) {
 
-                        Geocode geocoder = new Geocode();
+                        Geocode geocoder = new Geocode(SearchActivity.this);
                         double[] ltglng = geocoder.geocode(location);
 
                         lat = ltglng[0];
@@ -139,10 +172,8 @@ public class SearchActivity extends Activity {
         lat = -1;
         lng = -1;
     }
-    public void updateLocation(double[] location){
-        lat=location[0];
-        lng =location[1];
-    }
+
+
 
     public void onComplete( ArrayList<MarkerOptions> markers){
         Intent addIntent = new Intent(this,MainActivity.class);

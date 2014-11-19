@@ -25,6 +25,12 @@
             android:inputType="text"
             android:imeOptions="actionSend"
             android:layout_weight="1"/>
+        <Button
+            android:id="@+id/button_current"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:text="Use Current"
+            android:onClick="onClick"/>
     </TableRow>
     <TableRow>
         <TextView
