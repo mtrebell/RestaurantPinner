@@ -207,25 +207,25 @@ public class UserGrid {
         JSONObject response = new JSONObject();
         try {
             String entity ="/users/"+uId+ "/"+LIKE+"?ql=";
-            String query = "select uuid,name";
+            String query = "select uuid,name,address,location";
             response.accumulate(LIKE,  sendGet(entity,query));
 
             entity ="/users/"+uId+ "/"+FAV+"?ql=";
-            query = "select uuid,name";
+            query = "select uuid,name,address,location";
 
             response.accumulate( FAV, sendGet(entity, query));
 
 
             entity = "/users/" + uId + "/"+WISH+"?ql=";
-            query = "select uuid,name";
+            query = "select uuid,name,address,location";
             response.accumulate(WISH, sendGet(entity, query));
 
             entity = "/users/" + uId + "/"+REC+"?ql=";
-            query = "select uuid,name";
+            query = "select uuid,name,address,location";
             response.accumulate(REC, sendGet(entity, query));
 
             entity = "/users/" + uId + "/"+DIS+"?ql=";
-            query = "select uuid,name,loc";
+            query = "select uuid,name,address,location";
             response.accumulate(DIS, sendGet(entity, query));
         }catch (JSONException e) {
             e.printStackTrace();
@@ -242,10 +242,10 @@ public class UserGrid {
         Iterator<String> keys = data.keys();
 
         while(keys.hasNext()){
-            String key = keys.next();
+           String key = keys.next();
             JSONArray restraunts;
             try {
-                restraunts = (JSONArray)((JSONObject) data.get(key)).get("entities");
+                restraunts = (JSONArray)((JSONObject) data.get(key)).get("list");
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
@@ -253,27 +253,38 @@ public class UserGrid {
 
             for(int i=0;i<restraunts.length();i++){
                 try {
-                    String uuid = ((JSONObject)restraunts.get(i)).getString("uuid");
-                    String name = ((JSONObject)restraunts.get(i)).getString("name");
-                    double lat = ((JSONObject)restraunts.get(i)).getDouble("latitude");
-                    double lng = ((JSONObject)restraunts.get(i)).getDouble("longitude");
+                    String uuid =restraunts.getJSONArray(i).getString(0);
+                    String name = restraunts.getJSONArray(i).getString(1);
+
+                    StringBuilder address =new StringBuilder();
+                    JSONArray add = restraunts.getJSONArray(i).getJSONArray(2);
+                    for(int j=0;j<add.length()-1;j++){ //Skip Province and Country
+                        address.append(add.getString(j));
+                        address.append(" ");
+                    }
+
+                    JSONObject latlng = restraunts.getJSONArray(i).getJSONObject(3);
+                    Double lat = latlng.getDouble("latitude");
+                    Double lng = latlng.getDouble("longitude");
 
                     //Update old data
-                    if(!pins.containsKey(uuid)) {
-                        Pin pin = pins.get(key);
+                    if(pins.containsKey(uuid)) {
+                        Pin pin = pins.get(uuid);
                         pin.types.add(key);
                         pins.put(uuid, pin);
                     }
                     //Create new
-                    else
-                        pins.put(uuid,new Pin(uuid,name,lat,lng));
+                    //ADD LAT LNG
+                    else {
+                        pins.put(uuid, new Pin(uuid, name,address.toString(),key, lat, lng));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                     return null;
                 }
             }
         }
-
+        Log.d("PINS",pins.toString());
         return pins;
     }
 

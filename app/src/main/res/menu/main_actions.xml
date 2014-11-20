@@ -22,6 +22,11 @@
     <item android:id="@+id/action_login"
         android:icon="@drawable/ic_button"
         android:title="Login"
-        android:showAsAction="always"/>
+        android:showAsAction="never"/>
+
+    <item android:id="@+id/action_pins"
+        android:icon="@drawable/ic_action_newpin"
+        android:title="@string/action_pins"
+        android:showAsAction="never" />
 
 </menu>

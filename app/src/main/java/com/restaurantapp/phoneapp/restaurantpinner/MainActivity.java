@@ -49,7 +49,7 @@ public class MainActivity extends FragmentActivity {
 
         pager = (ViewPager)findViewById(R.id.pager);
         pager.setAdapter(adapter);
-        pager.setOffscreenPageLimit(4);
+        pager.setOffscreenPageLimit(2);
 
         addTabs();
 
@@ -93,6 +93,10 @@ public class MainActivity extends FragmentActivity {
                 return true;
             case R.id.action_notification:
                 openNotification();
+                return true;
+            case R.id.action_pins:
+                openPins();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -165,6 +169,11 @@ public class MainActivity extends FragmentActivity {
         Intent newIntent = new Intent(this,NewPinActivity.class);
         newIntent.putExtra("lat",loc[0]);
         newIntent.putExtra("lng",loc[1]);
+        startActivity(newIntent);
+    }
+
+    private  void openPins(){
+        Intent newIntent = new Intent(this,PinActivity.class);
         startActivity(newIntent);
     }
 
