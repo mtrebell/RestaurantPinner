@@ -22,14 +22,7 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login2);
-
-        Intent intent = getIntent();
-        if(savedInstanceState != null) {
-            int index = savedInstanceState.getInt("index");
-            getActionBar().setSelectedNavigationItem(index);
-        }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
