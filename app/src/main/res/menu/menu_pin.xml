@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.restaurantapp.phoneapp.restaurantpinner.PinActivity">
+    <item android:id="@+id/action_home" android:title="Home"
+        android:orderInCategory="100" android:showAsAction="ifRoom" />
+    <item android:id="@+id/action_edit" android:title="Edit"
+        android:orderInCategory="100" android:showAsAction="ifRoom"/>
+</menu>

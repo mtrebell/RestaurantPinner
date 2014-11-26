@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name="com.restaurantapp.phoneapp.restaurantpinner.MyApplication"
@@ -63,7 +64,7 @@
                 android:value="com.example.fix.myapplication.MyActivity" />
         </activity>
         <activity
-            android:name="com.restaurantapp.phoneapp.restaurantpinner.Notification"
+            android:name=".NotificationActivity"
             android:label="@string/title_activity_notification"
             android:theme="@android:style/Theme.Holo.Light.DarkActionBar" >
         </activity>
@@ -76,7 +77,6 @@
             android:label="@string/title_activity_pin"
             android:parentActivityName="com.restaurantapp.phoneapp.restaurantpinner.MainActivity"
             android:theme="@android:style/Theme.Holo.Light.DarkActionBar" >
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fix.myapplication.MyActivity" />
@@ -84,6 +84,14 @@
         <activity
             android:name="com.restaurantapp.phoneapp.restaurantpinner.FriendActivity"
             android:label="@string/title_activity_friend" >
+        </activity>
+        <activity
+            android:name="com.restaurantapp.phoneapp.restaurantpinner.MapActivity"
+            android:label="@string/title_activity_map"
+            android:theme="@android:style/Theme.Dialog" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.fix.myapplication.MyActivity" />
         </activity>
     </application>
 

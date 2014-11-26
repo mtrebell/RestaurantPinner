@@ -94,8 +94,11 @@ public class MainActivity extends FragmentActivity {
             case R.id.action_notification:
                 openNotification();
                 return true;
-            case R.id.action_pins:
+            case  R.id.action_pins:
                 openPins();
+                return true;
+            case R.id.action_friends:
+                openFriends();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -141,8 +144,6 @@ public class MainActivity extends FragmentActivity {
                 })
                 .setIcon(android.R.drawable.ic_input_add)
                 .show();
-        //Intent addIntent = new Intent(this,NewPinActivity.class);
-        //startActivity(addIntent);
     }
 
     private void openSearch() {
@@ -161,7 +162,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void openNotification() {
-        Intent notIntent = new Intent(this,Notification.class);
+        Intent notIntent = new Intent(this,NotificationActivity.class);
         startActivity(notIntent);
     }
 
@@ -174,6 +175,11 @@ public class MainActivity extends FragmentActivity {
 
     private  void openPins(){
         Intent newIntent = new Intent(this,PinActivity.class);
+        startActivity(newIntent);
+    }
+
+    private void openFriends(){
+        Intent newIntent = new Intent(this,FriendActivity.class);
         startActivity(newIntent);
     }
 

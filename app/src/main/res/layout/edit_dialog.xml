@@ -1,0 +1,68 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_name"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_gravity="center|bottom" android:orientation="vertical"
+    >
+
+
+<TableRow
+    android:layout_gravity="center"
+    android:layout_weight="1">
+    <ToggleButton
+        android:id="@+id/rec"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:background="@drawable/ic_action_person"
+        android:textOn="@string/toggle_turn_on"
+        android:textOff="@string/toggle_turn_off"
+        android:onClick="onToggleClick"
+        />
+    <ToggleButton
+        android:id="@+id/fav"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:background="@drawable/ic_button"
+        android:textOn="@string/toggle_turn_on"
+        android:textOff="@string/toggle_turn_off"
+        android:onClick="onToggleClick"
+        />
+    <ToggleButton
+        android:id="@+id/wish"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:background="@drawable/ic_button"
+        android:textOn="@string/toggle_turn_on"
+        android:textOff="@string/toggle_turn_off"
+        android:onClick="onToggleClick"
+        />
+</TableRow>
+    <TableRow
+        android:layout_gravity="center"
+        android:layout_weight="1">
+        <ToggleButton
+            android:id="@+id/like"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:background="@drawable/ic_button"
+            android:textOn="@string/toggle_turn_on"
+            android:textOff="@string/toggle_turn_off"
+            android:onClick="onToggleClick"
+            />
+        <ToggleButton
+            android:id="@+id/dis"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:background="@drawable/ic_button"
+            android:textOn="@string/toggle_turn_on"
+            android:textOff="@string/toggle_turn_off"
+            android:onClick="onToggleClick"
+
+            />
+    </TableRow>
+
+</TableLayout>

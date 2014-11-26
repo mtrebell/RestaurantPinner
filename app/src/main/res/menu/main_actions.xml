@@ -29,4 +29,10 @@
         android:title="@string/action_pins"
         android:showAsAction="never" />
 
+    <item android:id="@+id/action_friends"
+        android:icon="@drawable/ic_action_person"
+        android:title="@string/action_friends"
+        android:showAsAction="never" />
+
+
 </menu>

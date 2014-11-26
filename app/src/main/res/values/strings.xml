@@ -32,5 +32,9 @@
     <string name="password">Password: </string>
     <string name="button_login_text">Login</string>
     <string name="action_pins">My Pins</string>
+    <string name="title_activity_map">MapActivity</string>
+    <string name="action_friends">My Friends</string>
+    <string name="action_addFriend">Add Friend</string>
+    <string name="action_home">Home</string>
 
 </resources>
