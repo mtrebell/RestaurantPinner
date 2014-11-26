@@ -96,18 +96,21 @@ public class UserGrid {
         return true;
     }
 
-    public boolean addAccount(String username,String pass){
+    public boolean addAccount(String username,String pass,String email){
         String query = "/users";
-        String params = "{\"username\":"+ username + ", \"password\":"+ pass + "}";
+        String params = "{\"username\":\""+ username + "\",\"password\":\""+ pass + "\",\"email\":\"" + email +"\"}";
 
         try {
             JSONObject jsonParam = new JSONObject(params);
+            System.out.println("Enter into sendput");
             JSONObject response = sendPut(query, jsonParam);
             System.out.println(response.toString());
         }catch(JSONException e){
+            System.out.println("JSON Exception");
             System.out.println(e.getMessage());
             return false;
         }catch(IOException e){
+            System.out.println("IO exception");
             System.out.println(e.getMessage());
             return false;
         }
@@ -556,6 +559,8 @@ public class UserGrid {
     }
 
     private JSONObject sendPut(String query, JSONObject jsonParam) throws IOException, JSONException {
+        String temp = (baseUrl + query);
+        System.out.println(temp);
         URL url = new URL(baseUrl + query);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setDoOutput(true);
@@ -573,6 +578,7 @@ public class UserGrid {
             InputStreamReader in = new InputStreamReader(con.getInputStream());
             results= readStream(new BufferedReader(in));
         } catch (IOException e) {
+            System.out.println(baseUrl);
             System.out.println(e.getMessage());
             return null;
         } finally {
