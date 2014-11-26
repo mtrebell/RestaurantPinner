@@ -136,8 +136,14 @@ public class UserGrid {
     }
 
     public boolean addFriend( String friend){
-        String query = "/users/" + uId + "/friends/"+friend+"?access_token="+accessToken;
-        request(query,"PUT");
+        String query = "/users/" + uId + "/friends/users/"+friend+"?access_token="+accessToken;
+        try {
+            sendPut(query,null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 
@@ -299,7 +305,13 @@ public class UserGrid {
         for(String pin:pinType) {
             query = "/users/" +uId +"/"+ pin + "/restaurants/" + restraunt+"?access_token="+accessToken;
             Log.d("ADD PIN",query);
-            Log.d("RESULT",request(query, "POST").toString());
+            try {
+                sendPut(query,null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
@@ -327,20 +339,26 @@ public class UserGrid {
             return false;
 
         for(String user: users) {
-            query = "/users/" + user + "/recnotice/" + restraunt + "?access_token=" + accessToken;
+            query = "/users/" + user + "/recpin/restaurant/" + restraunt + "?access_token=" + accessToken;
             Log.d("Adding the pin.....","query");
-            request(query, "PUT");
+            try {
+                sendPut(query,null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
 
 
-    public boolean removeRecomendation(String restraunt, String user){
+    public boolean removeRecomendation(String restraunt){
         //to quickly grab all pins
         String query;
         //Specific Type, allows user filters to be added later on
 
-        query = "/users/" +user +"/recnotice/" + restraunt+"?access_token="+accessToken;
+        query = "/users/" +uId +"/recnotice/" + restraunt+"?access_token="+accessToken;
         request(query,"DELETE");
 
         return true;
