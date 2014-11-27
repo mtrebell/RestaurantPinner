@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/imgIcon"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight=".25"/>
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
+    <ImageButton
+        android:id="@+id/confirm"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/ic_action_accept"
+        android:layout_weight=".1"/>
+    <ImageButton
+        android:id="@+id/remove"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/ic_action_cancel"
+        android:layout_weight=".1"/>
+</LinearLayout>

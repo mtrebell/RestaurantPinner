@@ -48,8 +48,6 @@ public class MyMapFragment extends Fragment {
     private GoogleMap map;
     private LatLngBounds bounds;
 
-
-
     private OnFragmentInteractionListener mListener;
 
     public static MyMapFragment newInstance(String param1, String param2) {

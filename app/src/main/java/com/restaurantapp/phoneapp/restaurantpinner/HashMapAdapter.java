@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -47,7 +48,7 @@ import android.widget.TextView;
                 convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_friends, parent, false);
 
             //Use list_friends format, hide delete button
-            ImageView delete = (ImageView)convertView.findViewById(R.id.delete);
+            Button delete = (Button)convertView.findViewById(R.id.delete);
             TextView email = (TextView)convertView.findViewById(R.id.txtSub);
             TextView username = (TextView)convertView.findViewById(R.id.txtTitle);
 
@@ -57,5 +58,7 @@ import android.widget.TextView;
 
             return convertView;
         }
+
+
     }
 

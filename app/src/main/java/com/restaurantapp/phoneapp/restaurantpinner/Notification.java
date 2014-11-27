@@ -1,36 +1,21 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+/**
+ * Created by fix on 25/11/2014.
+ */
+public class Notification {
+    public final static int FRIEND = 0, PIN=1;
+    public int type;
+    public String restaurantUUID;
+    public String restaurantName;
+    public String address;
 
-
-public class Notification extends Activity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification);
+    public Notification(int type,String restaurantUUID,String restaurantName,String address){
+        this.type=type;
+        this.restaurantUUID=restaurantUUID;
+        this.restaurantName=restaurantName;
+        this.address=address;
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.notification, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }

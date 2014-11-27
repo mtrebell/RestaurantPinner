@@ -102,11 +102,11 @@ public class NewPinActivity extends Activity {
 
         if (fav.isChecked())
             types.add(UserGrid.FAV);
-        if (fav.isChecked())
+        if (wish.isChecked())
             types.add(UserGrid.WISH);
-        if (fav.isChecked())
+        if (like.isChecked())
             types.add(UserGrid.LIKE);
-        if (fav.isChecked())
+        if (dis.isChecked())
             types.add(UserGrid.DIS);
 
         if (types.isEmpty() && !rec.isChecked()) {
@@ -204,7 +204,7 @@ public class NewPinActivity extends Activity {
                 Log.d("Adding pin","------------");
                 List<String> friends = prams[0];
                 if(friends!=null && !friends.isEmpty())
-                    usergrid.addRecomendation(uuid,friends);
+                    usergrid.addRecommendation(uuid,friends);
                 if(!types.isEmpty())
                     usergrid.addPin(uuid,types);
                 return null;
