@@ -70,7 +70,11 @@
         </activity>
         <activity
             android:name="com.restaurantapp.phoneapp.restaurantpinner.LoginActivity"
-            android:label="@string/title_activity_login" >
+            android:label="@string/title_activity_login"
+            android:theme="@style/Dialog">
+           <meta-data
+               android:name="android.support.PARENT_ACTIVITY"
+               android:value="com.example.fix.myapplication.MyActivity" />
         </activity>
         <activity
             android:name="com.restaurantapp.phoneapp.restaurantpinner.PinActivity"

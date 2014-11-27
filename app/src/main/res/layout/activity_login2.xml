@@ -1,67 +1,69 @@
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:configChanges="orientation"
     tools:context="com.restaurantapp.phoneapp.restaurantpinner.LoginActivity"
-    android:id="@+id/usrlogin">
+    android:id="@+id/usrlogin"
+    style="@style/Dialog">
 
-    <TableRow
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/userId"
+        android:layout_column="1"
+        android:hint="User Name"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="131dp"
+        android:minWidth="200dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/user_id"
-            android:id="@+id/textUserId" />
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/password"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/pwd"
+        android:layout_marginTop="31dp"
+        android:layout_below="@+id/userId"
+        android:layout_centerHorizontal="true"
+        android:minWidth="200dp" />
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/userId"
-            android:layout_column="1"
-            android:text="User Name" />
-    </TableRow>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_login_text"
+        android:id="@+id/button_login"
+        android:layout_marginTop="48dp"
+        android:layout_below="@+id/pwd"
+        android:layout_alignLeft="@+id/userId"
+        android:layout_alignStart="@+id/userId"
+        android:onClick="onClick"
+        android:minWidth="100dp" />
 
-    <TableRow
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_clear_text"
+        android:id="@+id/button_clear"
+        android:layout_toRightOf="@+id/button_login"
+        android:layout_alignTop="@+id/button_login"
+        android:minWidth="100dp"
+        android:maxWidth="100dp"
+        android:onClick="onClick"
+        android:layout_alignRight="@+id/pwd"
+        android:layout_alignEnd="@+id/pwd" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/password"
-            android:id="@+id/textPassword" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create New User"
+        android:id="@+id/button_new_user"
+        android:layout_below="@+id/button_login"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="66dp"
+        android:onClick="onClick"/>
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:ems="10"
-            android:id="@+id/pwd" />
-    </TableRow>
-
-    <TableRow
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="150dp"
-            android:maxWidth="150dp"
-            android:text="@string/button_login_text"
-            android:id="@+id/button_login"
-            android:onClick="onClick"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_clear_text"
-            android:id="@+id/button_clear"
-            android:onClick="onClick"/>
-    </TableRow>
-
-</TableLayout>
+</RelativeLayout>

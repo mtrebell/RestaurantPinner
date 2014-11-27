@@ -1,10 +1,15 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +59,10 @@ public class LoginActivity extends Activity {
 
             case R.id.button_login:
                 login();
+                break;
+            case R.id.button_new_user:
+                new NewUserDialog(this);
+                break;
         }
     }
 
@@ -100,19 +109,115 @@ public class LoginActivity extends Activity {
     }
 
     private void onComplete(Boolean result){
+        Toast toast;
         if(!result){
-            Toast toast = Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT);
+            toast = Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }else{
             final UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
             uuid = usergrid.getUID();
             accessToken = usergrid.getAccessToken();
-
+            toast = Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
             Intent openMainActivity= new Intent(this, MainActivity.class);
             openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(openMainActivity);
         }
         return;
+    }
+
+    private void newUser(String username, String pass, String email){
+        final UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
+        final String user = username;
+        final String password = pass;
+        final String e_mail = email;
+        new AsyncTask<Void,Void,Boolean>(){
+
+            @Override
+            protected Boolean doInBackground(Void...voids){
+                return usergrid.addAccount(user, password, e_mail);
+            }
+
+            protected void onPostExecute(Boolean result){
+                onNewUserComplete(result);
+            }
+        }.execute();
+    }
+
+    protected void onNewUserComplete(Boolean result){
+        Toast toast;
+        if(!result){
+            toast = Toast.makeText(this, "New user creation failed", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            return;
+        }else{
+            toast = Toast.makeText(this, "New user created!", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            Intent openMainActivity= new Intent(this, MainActivity.class);
+            openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(openMainActivity);
+        }
+    }
+
+    public class NewUserDialog{
+        public NewUserDialog(final Context context){
+            /*final Toast toast = Toast.makeText(context, "Creating new", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();*/
+
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+            LayoutInflater inflater = getLayoutInflater();
+            final View convertView = (View) inflater.inflate(R.layout.dialog_new_user, null);
+            alertDialog.setView(convertView);
+            alertDialog.setTitle("Create New User");
+
+            alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    String username;
+                    String password;
+                    String rePassword;
+                    String email;
+                    Toast toast;
+
+                    EditText text = (EditText) convertView.findViewById(R.id.editUsername);
+                    username = text.getText().toString();
+
+                    text = (EditText) convertView.findViewById(R.id.editPass);
+                    password = text.getText().toString();
+
+                    text = (EditText) convertView.findViewById(R.id.editRePass);
+                    rePassword = text.getText().toString();
+
+                    text = (EditText) convertView.findViewById(R.id.editEmail);
+                    email = text.getText().toString();
+
+                    if(username.isEmpty() || password.isEmpty() || rePassword.isEmpty() || email.isEmpty()){
+                        toast = Toast.makeText(context,"One or more fields above is empty", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                        return;
+                    }else if(!password.equals(rePassword)){
+                        toast = Toast.makeText(context, "Password and re-enter password does not match", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                        return;
+                    }
+                    newUser(username,password,email);
+                    return;
+                }
+            });
+
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface,int i) {
+                }
+            });
+            alertDialog.show();
+        }
     }
 }
