@@ -76,16 +76,16 @@ public final class Geocode implements LocationListener {
         //Get listeners
         Location loc = null;
         if(gpsLoc) {
-            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            //wait for location set a time out.....
+            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
             loc = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            //check for accuracy if want better
             if(loc==null){
-                manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+                manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
                 loc=manager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
         }
         else if(netLoc) {
-            manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
             loc=manager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         }
 
@@ -108,7 +108,7 @@ public final class Geocode implements LocationListener {
         String address ="";
         try {
             URL url = new URL("https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng);
-            Log.d("Query",url.toString());
+
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setDoOutput(true);
 

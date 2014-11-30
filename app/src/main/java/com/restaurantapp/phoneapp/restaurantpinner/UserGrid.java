@@ -147,15 +147,56 @@ public class UserGrid {
         return true;
     }
 
+    public boolean requestFriend( List<String> friends){
+        for(String friend:friends) {
+            String query = "/users/" + uId + "/recfriend/users/" + friend + "?access_token=" + accessToken;
+            request(query, "PUT");
+        }
+        return true;
+    }
+
+    public boolean removeRequestFriend( String friend){
+        String query = "/users/" + uId + "/recfriend/users/"+friend+"?access_token="+accessToken;
+        request(query,"DELETE");
+        return true;
+    }
+
     public boolean removeFriend( String friend){
         String query = "/users/" + uId + "/friends/"+friend+"?access_token="+accessToken;
         request(query,"DELETE");
         return true;
     }
 
+    public boolean addRecommendation(String restraunt, List<String> users){
+        //to quickly grab all pins
+        String query;
+        //Specific Type, allows user filters to be added later on
+        Log.d("Adding the pin.....","recomendation");
 
-    public Map<String,String> searchUser(String username){
-        Map<String,String> users = new HashMap<String,String>();
+        for(String user : users) {
+            query = "/users/" + user + "/recnotice/restaurant/" + restraunt + "?access_token=" + accessToken;
+            Log.d("Adding the pin.....", "query");
+            request(query, "PUT");
+        }
+
+        return true;
+    }
+
+
+    public boolean removeRecomendation(String restraunt, String user){
+        //to quickly grab all pins
+        String query;
+        //Specific Type, allows user filters to be added later on
+
+        query = "/users/" +user +"/recnotice/" + restraunt+"?access_token="+accessToken;
+        request(query,"DELETE");
+
+        return true;
+    }
+
+
+    public HashMap<String,String> searchUser(String username){
+        HashMap<String,String> users = new HashMap<String,String>();
         String entity ="/users?ql=";
         String query = "select uuid,username,email where username= '"+username + "*'";
         JSONObject response = sendGet(entity,query);
@@ -362,6 +403,73 @@ public class UserGrid {
         request(query,"DELETE");
 
         return true;
+    }
+
+    public HashMap<String,Notification> getNotifications(){
+        HashMap<String,Notification> notifications = new HashMap<String, Notification>();
+        JSONObject response = new JSONObject();
+        try {
+            String entity = "/users/" + uId + "/reqfriend/";
+            String query = "select uuid,name,email";
+            response.accumulate("friend", sendGet(entity, query));
+
+            entity = "/users/" + uId + "/reqnot";
+            query = "select uuid,name,address";
+
+            response.accumulate("pin", sendGet(entity, query));
+
+            Iterator<String> keys = response.keys();
+            while (keys.hasNext()){
+                String uuid;
+                String name;
+                int type;
+
+                String key = keys.next();
+                JSONArray data = response.getJSONArray("keys");
+
+                if(key=="pin") {
+                    type = Notification.PIN;
+                    for (int i = 0; i < data.length(); i++) {
+
+                        JSONObject notification = data.getJSONObject(i);
+                        uuid = notification.getString("uuid");
+                        name = notification.getString("name");
+
+                        StringBuilder address = new StringBuilder();
+                        JSONArray add = notification.getJSONArray("uuid");
+
+                        for(int j=0;j<add.length()-2;j++){
+                            address.append(add.getString(j));
+                        }
+
+                        notifications.put(uuid,new Notification(type,uuid,name,address.toString()));
+
+                    }
+                }
+
+                else{
+                    type = Notification.FRIEND;
+                    for (int i = 0; i < data.length(); i++) {
+
+                        JSONObject notification = data.getJSONObject(i);
+                        uuid = notification.getString("uuid");
+                        name = notification.getString("name");
+                        String address  = notification.getString("email");
+
+                        notifications.put(uuid,new Notification(type,uuid,name,address));
+
+                    }
+                }
+
+            }
+
+            //build notifications
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+        return notifications;
     }
 
     //Restaurant Functions:

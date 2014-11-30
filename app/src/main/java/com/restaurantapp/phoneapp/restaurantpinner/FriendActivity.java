@@ -1,6 +1,9 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,15 +12,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FriendActivity extends Activity {
 
@@ -66,7 +73,7 @@ public class FriendActivity extends Activity {
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()){
                 case R.id.action_add:
-                    new SearchDialog();
+                    searchDialog();
                     return true;
                 case R.id.action_home:
                     return true;
@@ -74,6 +81,40 @@ public class FriendActivity extends Activity {
                     return false;
             }
         }
+
+    public void searchDialog(){
+        // get prompts.xml view
+        LayoutInflater li = LayoutInflater.from(this);
+        View promptsView = li.inflate(R.layout.user_search, null);
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+
+        // set prompts.xml to alertdialog builder
+        alertDialogBuilder.setView(promptsView);
+
+        final EditText userInput = (EditText) promptsView
+                .findViewById(R.id.username);
+
+
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("Search",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                findFriend(userInput.getText().toString());
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+      AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 
 
     public void onClick(View view){
@@ -178,26 +219,92 @@ public class FriendActivity extends Activity {
     }
 
     private void findFriend(String name) {
-        new AsyncTask<String,Void,Void>(){
+        new AsyncTask<String, Void, HashMap<String, String>>(){
 
             @Override
-            protected Void doInBackground(String... strings) {
-                usergrid.searchUser(strings[0]);
-                return null;
+            protected HashMap<String, String> doInBackground(String... strings) {
+                return usergrid.searchUser(strings[0]);
+            }
+
+            @Override
+            protected void onPostExecute(HashMap<String, String> result) {
+                if(result!=null && !result.isEmpty()){
+                    friendDialog(result);
+                }
+                //Else error msg
+                //Back to search dialog
             }
         }.execute(name);
     }
 
-    private void addFriend(String uuid) {
-        new AsyncTask<String,Void,Void>(){
+
+    public class FriendsDialog {
+        HashMapAdapter adapter;
+        ListView lv;
+        public int selected;
+        String username;
+        List<String> friends;
+
+        public FriendsDialog(HashMap<String,String> users,Context context) {
+            friends = new ArrayList<String>();
+
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+            LayoutInflater inflater = getLayoutInflater();
+            View convertView = (View) inflater.inflate(R.layout.fragment_item_list, null);
+            alertDialog.setView(convertView);
+            alertDialog.setTitle("Choose Friend(s)");
+
+            alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    addFriend(friends);
+                }
+
+            });
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+
+            lv = (ListView) convertView.findViewById(R.id.list);
+            lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
+                    String friend = adapter.getItem(position);
+                    if(friends.contains(friend))
+                        friends.remove(friend);
+                    else
+                        friends.add(friend);
+                }
+            });
+
+            adapter = new HashMapAdapter(users);
+            lv.setAdapter(adapter);
+
+            alertDialog.show();
+        }
+
+    }
+
+    public void friendDialog(HashMap<String,String> result){
+        new FriendsDialog(result,this);
+    }
+
+    private void addFriend(List<String> uuid) {
+        new AsyncTask<List<String>,Void,Void>(){
 
             @Override
-            protected Void doInBackground(String... strings) {
+            protected Void doInBackground(List<String>... strings) {
                 usergrid.requestFriend(strings[0]);
                 return null;
             }
         }.execute(uuid);
     }
+
 
 
     private void removeFriend(String uuid) {
@@ -209,18 +316,5 @@ public class FriendActivity extends Activity {
                 return null;
             }
         }.execute(uuid);
-    }
-
-    public class SearchDialog {
-        public SearchDialog(){
-            //Alertdialog
-            //EDIT TEXTVIEW
-            //CONFIRM
-            //CANCEL
-            //SEARCH
-            //new dialog chose friend
-                //same as newpin friend dialog
-                    //add Friend
-        }
     }
 }
