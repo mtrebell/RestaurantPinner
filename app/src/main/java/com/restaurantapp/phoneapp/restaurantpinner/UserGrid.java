@@ -79,15 +79,17 @@ public class UserGrid {
 
     public boolean chgPassword(String user,String oldPass,String newPass){
         String query = "/users/"+user+"/password";
-        String params = "{\"newpassword\":" + newPass + ",\"oldPassword\":" + oldPass +"}";
+        String params = "{\"newpassword\":\"" + newPass + "\",\"oldPassword\":\"" + oldPass +"\"}";
 
         try {
             JSONObject jsonParam = new JSONObject(params);
             JSONObject response = sendPut(query, jsonParam);
         }catch(JSONException e){
+            System.out.println("JSON Fail");
             System.out.println(e.getMessage());
             return false;
         }catch(IOException e){
+            System.out.println("IOFail");
             System.out.println(e.getMessage());
             return false;
         }
@@ -118,10 +120,10 @@ public class UserGrid {
         return true;
     }
 
-    public boolean deleteAccount(String username,String pass)
+    public boolean deleteAccount(String username)
     {
         String query = "/users/"+username+"?access_token="+accessToken;
-        request(query, "DELETE");
+        System.out.println(request(query, "DELETE"));
         return true;
     }
 
@@ -693,6 +695,9 @@ public class UserGrid {
         con.setRequestProperty("Content-Type", "application/json");
 
         OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+
+        System.out.println(con.getResponseMessage());
+
         if(jsonParam != null){
             String data = jsonParam.toString();
             wr.write(data);

@@ -64,17 +64,17 @@
                 android:value="com.example.fix.myapplication.MyActivity" />
         </activity>
         <activity
-            android:name=".NotificationActivity"
+            android:name="com.restaurantapp.phoneapp.restaurantpinner.NotificationActivity"
             android:label="@string/title_activity_notification"
             android:theme="@android:style/Theme.Holo.Light.DarkActionBar" >
         </activity>
         <activity
             android:name="com.restaurantapp.phoneapp.restaurantpinner.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/Dialog">
-           <meta-data
-               android:name="android.support.PARENT_ACTIVITY"
-               android:value="com.example.fix.myapplication.MyActivity" />
+            android:theme="@style/Dialog" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.fix.myapplication.MyActivity" />
         </activity>
         <activity
             android:name="com.restaurantapp.phoneapp.restaurantpinner.PinActivity"
@@ -93,6 +93,15 @@
             android:name="com.restaurantapp.phoneapp.restaurantpinner.MapActivity"
             android:label="@string/title_activity_map"
             android:theme="@android:style/Theme.Dialog" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.fix.myapplication.MyActivity" />
+        </activity>
+        <activity
+            android:name="com.restaurantapp.phoneapp.restaurantpinner.AccountActivity"
+            android:label="@string/title_activity_account"
+            android:parentActivityName="com.restaurantapp.phoneapp.restaurantpinner.MainActivity"
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fix.myapplication.MyActivity" />

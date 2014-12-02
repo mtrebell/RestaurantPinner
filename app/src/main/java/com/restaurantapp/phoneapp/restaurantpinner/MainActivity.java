@@ -100,6 +100,8 @@ public class MainActivity extends FragmentActivity {
             case R.id.action_friends:
                 openFriends();
                 return true;
+            case R.id.action_account:
+                openAccount();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -180,6 +182,11 @@ public class MainActivity extends FragmentActivity {
 
     private void openFriends(){
         Intent newIntent = new Intent(this,FriendActivity.class);
+        startActivity(newIntent);
+    }
+
+    private void openAccount(){
+        Intent newIntent = new Intent(this,AccountActivity.class);
         startActivity(newIntent);
     }
 

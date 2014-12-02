@@ -36,5 +36,13 @@
     <string name="action_friends">My Friends</string>
     <string name="action_addFriend">Add Friend</string>
     <string name="action_home">Home</string>
+    <string name="title_activity_account">AccountActivity</string>
+    <string name="change_password">Change Password: </string>
+    <string name="old_password">Old Password</string>
+    <string name="new_password">New Password</string>
+    <string name="re_new_password">Re-Enter New Password</string>
+    <string name="button_change_pass">Change Password</string>
+    <string name="delete_account">Delete Account:</string>
+    <string name="button_delete_account">Delete Account</string>
 
 </resources>
