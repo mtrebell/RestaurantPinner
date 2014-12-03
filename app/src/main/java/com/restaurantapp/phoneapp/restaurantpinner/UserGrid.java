@@ -1,9 +1,11 @@
+//Decide if handling exceptions in request functions or outside of them
+//Handle fail in deletes
+
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.BufferedReader;
@@ -18,15 +20,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class UserGrid {
     public final static String FAV = "fav", WISH="wishlist",REC="reccomend",LIKE="like",DIS="dislike";
-    private static String baseUrl;
+    private String baseUrl;
     private String accessToken;
     private String uId;
 
@@ -36,36 +36,37 @@ public class UserGrid {
         this.baseUrl = baseUrl;
     }
 
+    /*--------------------For Testing Purposes only----------------------*/
     public UserGrid(String baseUrl,String uId,String accessToken){
         this.accessToken = accessToken;
         this.uId=uId;
         this.baseUrl = baseUrl;
     }
 
-    // Account Functions:
+    /*------------------------------Account Functions--------------------------------*/
     public boolean login(String user,String password){
         String query = "token?grant_type=password&username="+user+"&password="+password;
-
-        try{
             JSONObject response = sendGet(query,null);
-            if(response == null)
+            if(response == null) {
+                accessToken = null;
+                uId = null;
                 return false;
+            }
+        try {
             accessToken = response.getString("access_token");
             uId = response.getJSONObject("user").getString("uuid");
-        }catch(JSONException e){
+            return true;
+        }catch (JSONException e) {
             accessToken = null;
             uId = null;
             return false;
         }
-        return true;
     }
 
     public boolean logout(String user){
         String query = "/users/"+user+"/revoketokens?access_token="+accessToken;
-
-        //request(query, "PUT");
         try {
-            JSONObject response = sendPut(query, null);
+            sendPut(query, null);
         }catch(JSONException e){
             return false;
         }catch(IOException e){
@@ -83,16 +84,12 @@ public class UserGrid {
 
         try {
             JSONObject jsonParam = new JSONObject(params);
-            JSONObject response = sendPut(query, jsonParam);
+            sendPut(query, jsonParam);
         }catch(JSONException e){
-            System.out.println(e.getMessage());
             return false;
         }catch(IOException e){
-            System.out.println(e.getMessage());
             return false;
         }
-
-        //put(address,json);
         return true;
     }
 
@@ -102,37 +99,76 @@ public class UserGrid {
 
         try {
             JSONObject jsonParam = new JSONObject(params);
-            System.out.println("Enter into sendput");
-            JSONObject response = sendPut(query, jsonParam);
-            System.out.println(response.toString());
+            sendPut(query, jsonParam);
         }catch(JSONException e){
-            System.out.println("JSON Exception");
-            System.out.println(e.getMessage());
             return false;
         }catch(IOException e){
-            System.out.println("IO exception");
-            System.out.println(e.getMessage());
             return false;
         }
-        //put(address,json);
+
         return true;
     }
 
-    public boolean deleteAccount(String username,String pass)
+    public boolean deleteAccount(String username)
     {
         String query = "/users/"+username+"?access_token="+accessToken;
         request(query, "DELETE");
         return true;
     }
 
+    /*---------------------Friends Functions--------------------*/
+    public HashMap<String,String> searchUser(String username){
+        String entity ="/users?ql=";
+        String query = "select uuid,username,email where username= '"+username + "*'";
+        JSONObject response = sendGet(entity,query);
+        return userParse(response);
+    }
+
     public HashMap<String,String> getFriends(){
-        Log.d("ADD PIN","Searching for frineds....");
-        HashMap<String,String> friends = new HashMap<String,String>();
-        String entity = "users/"+uId+"/friend?ql=";
+        String entity = "users/"+uId+"/friends?ql=";
         String query = "select uuid,username,email";
         JSONObject response = sendGet(entity,query);
-        friends=userParse(response);
-        return friends;
+        return userParse(response);
+    }
+
+    public HashMap<String,String> userParse(JSONObject response){
+        HashMap<String,String> users = new HashMap<String,String>();
+        JSONArray friends;
+
+        try {
+            friends = response.getJSONArray("list");
+        } catch (JSONException e) {
+           return null;
+        }
+        for(int i=0;i<friends.length();i++){
+            JSONArray friend;
+            try {
+                friend = friends.getJSONArray(i);
+            } catch (JSONException e) {
+                return null;
+            }
+
+            String username;
+            try {
+                username = friend.getString(1);
+            } catch (JSONException e) {
+                return null;
+            }
+
+            if(username!=null){
+                String email;
+                try {
+                    email = friend.getString(2);
+                } catch (JSONException e) {
+                    return null;
+                }
+                if(email!=null)
+                    users.put(username, email);
+                else
+                    users.put(username, "");
+            }
+        }
+        return users;
     }
 
     public boolean addFriend( String friend){
@@ -140,24 +176,10 @@ public class UserGrid {
         try {
             sendPut(query,null);
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         } catch (JSONException e) {
-            e.printStackTrace();
+            return false;
         }
-        return true;
-    }
-
-    public boolean requestFriend( List<String> friends){
-        for(String friend:friends) {
-            String query = "/users/" + uId + "/recfriend/users/" + friend + "?access_token=" + accessToken;
-            request(query, "PUT");
-        }
-        return true;
-    }
-
-    public boolean removeRequestFriend( String friend){
-        String query = "/users/" + uId + "/recfriend/users/"+friend+"?access_token="+accessToken;
-        request(query,"DELETE");
         return true;
     }
 
@@ -167,153 +189,65 @@ public class UserGrid {
         return true;
     }
 
-    public boolean addRecommendation(String restraunt, List<String> users){
-        //to quickly grab all pins
-        String query;
-        //Specific Type, allows user filters to be added later on
-        Log.d("Adding the pin.....","recomendation");
-
-        for(String user : users) {
-            query = "/users/" + user + "/recnotice/restaurant/" + restraunt + "?access_token=" + accessToken;
-            Log.d("Adding the pin.....", "query");
-            request(query, "PUT");
+    public boolean requestFriend( List<String> friends){
+        for(String friend:friends) {
+            String query = "/users/" + friend + "/reqfriend/users/" + uId + "?access_token=" + accessToken;
+            try {
+                sendPut(query,null);
+            } catch (IOException e) {
+                return false;
+            } catch (JSONException e) {
+                return false;
+            }
         }
-
         return true;
     }
 
-
-    public boolean removeRecomendation(String restraunt, String user){
-        //to quickly grab all pins
-        String query;
-        //Specific Type, allows user filters to be added later on
-
-        query = "/users/" +user +"/recnotice/" + restraunt+"?access_token="+accessToken;
+    public boolean removeRequestFriend( String friend){
+        String query = "/users/" + uId + "/reqfriend/users/"+friend+"?access_token="+accessToken;
         request(query,"DELETE");
-
         return true;
     }
 
-
-    public HashMap<String,String> searchUser(String username){
-        HashMap<String,String> users = new HashMap<String,String>();
-        String entity ="/users?ql=";
-        String query = "select uuid,username,email where username= '"+username + "*'";
-        JSONObject response = sendGet(entity,query);
-        users = userParse(response);
-        return users;
-    }
-
-    public HashMap<String,String> userParse(JSONObject response){
-        HashMap<String,String> users = new HashMap<String,String>();
-        //PARSE STUFF HERE
-        JSONArray friends = null;
-
-        try {
-            friends = (JSONArray)response.get("list");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        for(int i=0;i<friends.length();i++){
-            JSONArray friend = null;
-            try {
-                friend = (JSONArray)friends.get(i);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            System.out.println(friend.toString());
-
-            String username = null;
-            try {
-                username = friend.getString(1);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return null;
-            }
-
-            if(username!=null){
-                System.out.println("HERE");
-                String email= null; //null is not reconized as string
-                try {
-                    email = (String) friend.get(0);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if(email!=null)
-                    users.put(username, email);
-                else
-                    users.put(username, "None");
-
-            }
-
-        }
-        System.out.println(users.toString());
-        return users;
-    }
-
-    //Pin Functions:
-
-    public JSONObject getPinInfo(){
-        JSONObject response = new JSONObject();
-        try {
-            String entity ="/users/"+uId+ "/"+LIKE+"?ql=";
-            String query = "select uuid,name,address,location";
-            response.accumulate(LIKE,  sendGet(entity,query));
-
-            entity ="/users/"+uId+ "/"+FAV+"?ql=";
-            query = "select uuid,name,address,location";
-
-            response.accumulate( FAV, sendGet(entity, query));
-
-
-            entity = "/users/" + uId + "/"+WISH+"?ql=";
-            query = "select uuid,name,address,location";
-            response.accumulate(WISH, sendGet(entity, query));
-
-            entity = "/users/" + uId + "/"+REC+"?ql=";
-            query = "select uuid,name,address,location";
-            response.accumulate(REC, sendGet(entity, query));
-
-            entity = "/users/" + uId + "/"+DIS+"?ql=";
-            query = "select uuid,name,address,location";
-            response.accumulate(DIS, sendGet(entity, query));
-        }catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return response;
-    }
-
-    //Returns all users pins <uuid,name>
+    /*-----------------Pin Functions--------------*/
     public HashMap<String, Pin> getPins(){
         HashMap<String,Pin> pins = new HashMap<String,Pin>();
-        JSONObject data = getPinInfo();
+        JSONObject data;
+
+        String base = "/users/" + uId + "/";
+        String query = "?ql=select uuid,name,address,location";
+        String[] types = {DIS,WISH,REC,FAV,LIKE};
+
+        try {
+            data = accumulate(base,types,query);
+        } catch (JSONException e) {
+            return null;
+        }
 
         Iterator<String> keys = data.keys();
 
         while(keys.hasNext()){
            String key = keys.next();
-            JSONArray restraunts;
+            JSONArray restaurants;
             try {
-                restraunts = (JSONArray)((JSONObject) data.get(key)).get("list");
+                restaurants = (JSONArray)((JSONObject) data.get(key)).get("list");
             } catch (JSONException e) {
-                e.printStackTrace();
                 return null;
             }
 
-            for(int i=0;i<restraunts.length();i++){
+            for(int i=0;i<restaurants.length();i++){
                 try {
-                    String uuid =restraunts.getJSONArray(i).getString(0);
-                    String name = restraunts.getJSONArray(i).getString(1);
+                    String uuid =restaurants.getJSONArray(i).getString(0);
+                    String name = restaurants.getJSONArray(i).getString(1);
 
                     StringBuilder address =new StringBuilder();
-                    JSONArray add = restraunts.getJSONArray(i).getJSONArray(2);
+                    JSONArray add = restaurants.getJSONArray(i).getJSONArray(2);
                     for(int j=0;j<add.length()-1;j++){ //Skip Province and Country
                         address.append(add.getString(j));
                         address.append(" ");
                     }
 
-                    JSONObject latlng = restraunts.getJSONArray(i).getJSONObject(3);
+                    JSONObject latlng = restaurants.getJSONArray(i).getJSONObject(3);
                     Double lat = latlng.getDouble("latitude");
                     Double lng = latlng.getDouble("longitude");
 
@@ -324,7 +258,6 @@ public class UserGrid {
                         pins.put(uuid, pin);
                     }
                     //Create new
-                    //ADD LAT LNG
                     else {
                         pins.put(uuid, new Pin(uuid, name,address.toString(),key, lat, lng));
                     }
@@ -334,89 +267,69 @@ public class UserGrid {
                 }
             }
         }
-        Log.d("PINS",pins.toString());
         return pins;
     }
 
-    public boolean addPin(String restraunt,List<String> pinType){
-        //to quickly grab all pins
+    public boolean addPin(String restaurant,List<String> pinType){
         String query;
 
-        //Specific Type, allows user filters to be added later on
         for(String pin:pinType) {
-            query = "/users/" +uId +"/"+ pin + "/restaurants/" + restraunt+"?access_token="+accessToken;
+            query = "/users/" +uId +"/"+ pin + "/restaurants/" + restaurant+"?access_token="+accessToken;
             Log.d("ADD PIN",query);
             try {
                 sendPut(query,null);
             } catch (IOException e) {
-                e.printStackTrace();
+                return false;
             } catch (JSONException e) {
-                e.printStackTrace();
+                return false;
             }
         }
         return true;
     }
 
-    //In phoneApp check if completely removed add pin to list if it is
-    //Also for dislike only allow dislike pin(Later Feature)
-    public boolean removePin(String restraunt,List<String> pinType){
-        if(pinType==null)
-            return false;
-
+    public boolean removePin(String restaurant,List<String> pinType){
         for(String pin:pinType) {
-            String query = "/users/" +uId +"/"+ pin + "/restaurants/" + restraunt+"?access_token="+accessToken;
+            String query = "/users/" +uId +"/"+ pin + "/restaurants/" + restaurant+"?access_token="+accessToken;
             request(query,"DELETE");
         }
         return true;
     }
 
-
-    public boolean addRecomendation(String restraunt, List<String> users){
-        //to quickly grab all pins
-        String query;
-        //Specific Type, allows user filters to be added later on
-        Log.d("Adding the pin.....","recomendation");
-        if(users == null)
-            return false;
-
-        for(String user: users) {
-            query = "/users/" + user + "/recpin/restaurant/" + restraunt + "?access_token=" + accessToken;
-            Log.d("Adding the pin.....","query");
+    public boolean addRecommendation(String restraunt, List<String> users){
+        for(String user : users) {
+            String query = "/users/" + user + "/recpin/restaurant/" + restraunt + "?access_token=" + accessToken;
             try {
                 sendPut(query,null);
             } catch (IOException e) {
-                e.printStackTrace();
+                return false;
             } catch (JSONException e) {
-                e.printStackTrace();
+                return false;
             }
         }
         return true;
     }
 
-
     public boolean removeRecomendation(String restraunt){
-        //to quickly grab all pins
-        String query;
-        //Specific Type, allows user filters to be added later on
 
-        query = "/users/" +uId +"/recnotice/" + restraunt+"?access_token="+accessToken;
+        String query;
+
+        query = "/users/" +uId +"/recpin/" + restraunt+"?access_token="+accessToken;
         request(query,"DELETE");
 
         return true;
     }
 
+    /*-------------------------Notification Functions----------------------*/
     public HashMap<String,Notification> getNotifications(){
         HashMap<String,Notification> notifications = new HashMap<String, Notification>();
-        JSONObject response = new JSONObject();
+
         try {
-            String entity = "/users/" + uId + "/reqfriend/";
-            String query = "select uuid,name,email";
-            response.accumulate("friend", sendGet(entity, query));
 
-            entity = "/users/" + uId + "/reqnot";
-            query = "select uuid,name,address";
+            String base = "/users/" + uId + "/";
+            String query = "?ql=select uuid,name,email";
+            String[] types = {"recpin","friends"};
 
-            response.accumulate("pin", sendGet(entity, query));
+            JSONObject response = accumulate(base,types,query);
 
             Iterator<String> keys = response.keys();
             while (keys.hasNext()){
@@ -425,57 +338,46 @@ public class UserGrid {
                 int type;
 
                 String key = keys.next();
-                JSONArray data = response.getJSONArray("keys");
+                JSONArray data = response.getJSONObject(key).getJSONArray("list");
 
-                if(key=="pin") {
+                if(key.equals("pin"))
                     type = Notification.PIN;
-                    for (int i = 0; i < data.length(); i++) {
+                else
+                    type = Notification.FRIEND;
 
-                        JSONObject notification = data.getJSONObject(i);
-                        uuid = notification.getString("uuid");
-                        name = notification.getString("name");
+                for (int i = 0; i < data.length(); i++) {
 
-                        StringBuilder address = new StringBuilder();
-                        JSONArray add = notification.getJSONArray("uuid");
+                        JSONArray notification = data.getJSONArray(i);
+                        uuid = notification.getString(0);
+                        name = notification.getString(1);
 
-                        for(int j=0;j<add.length()-2;j++){
-                            address.append(add.getString(j));
+                        if(type == Notification.PIN) {
+                            StringBuilder address = new StringBuilder();
+                            JSONArray add = notification.getJSONArray(2);
+
+                            for (int j = 0; j < add.length() - 2; j++) {
+                                address.append(add.getString(j));
+                            }
+
+                            notifications.put(uuid,new Notification(type,uuid,name,address.toString()));
                         }
 
-                        notifications.put(uuid,new Notification(type,uuid,name,address.toString()));
-
+                        else{
+                            String address  = notification.getString(2);
+                            notifications.put(uuid,new Notification(type,uuid,name,address));
+                        }
                     }
-                }
 
-                else{
-                    type = Notification.FRIEND;
-                    for (int i = 0; i < data.length(); i++) {
-
-                        JSONObject notification = data.getJSONObject(i);
-                        uuid = notification.getString("uuid");
-                        name = notification.getString("name");
-                        String address  = notification.getString("email");
-
-                        notifications.put(uuid,new Notification(type,uuid,name,address));
-
-                    }
-                }
 
             }
-
-            //build notifications
         }catch(Exception e){
-            e.printStackTrace();
             return null;
         }
 
         return notifications;
     }
 
-    //Restaurant Functions:
-
-    //Search by location name
-    public ArrayList<MarkerOptions>  restrauntSearch(String name,String address, Boolean pinsOnly){
+    public ArrayList<MarkerOptions> restaurantSearch(String name, double lat, double lon, double km, boolean pinsOnly){
         String entity;
         String query;
 
@@ -483,71 +385,33 @@ public class UserGrid {
             entity=uId+"/pin?ql=";
             query="select uuid,name,location";
         }
-        else{
-            entity="restaurants?ql=";
-            query= "select uuid,name,location";
-        }
 
-
-        if(name!=null){
-            query+=" where name_index contains \'"+ name + "\'";
-        }
-
-        JSONObject response = sendGet(entity,query);
-        JSONArray data = null;
-        try {
-            data = response.getJSONArray("list");
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return buildMarkers(data);
-    }
-
-
-    //Search location by lat lng
-    public ArrayList<MarkerOptions>  restrauntSearch(String name,double lat,double lon,double km,boolean pinsOnly){
-        String entity;
-        String query;
-        Log.d("Got a location",lat+" "+lon);
-
-        if(pinsOnly){
-            entity=uId+"/pin?ql=";
-            query="select uuid,name,location";
-        }
         else{
             entity="/restaurants?ql=";
             query= "select uuid,name,location";
         }
-
 
         if(!name.isEmpty()){
             query+=" where name_index contains \'"+ name + "\'";
         }
 
         if(lat !=-1){
-            Log.d("Got here","Im here");
             if(name.isEmpty())
                 query+=" where";
-
 
             if(km!=-0) {
                 query += " location within " + km * 1000 + " of " + lat + ',' + lon;
             }
-            //This accounts for tracking error
+
             else
                 query+=" location within 750 of " + lat + ',' + lon;
-            Log.d("query",query);
         }
 
         JSONObject response = sendGet(entity,query);
-        Log.d("Response",response.toString());
-        JSONArray data = null;
+        JSONArray data;
         try {
             data = response.getJSONArray("list");
         } catch (JSONException e) {
-            e.printStackTrace();
             return null;
         }
        return buildMarkers(data);
@@ -557,16 +421,13 @@ public class UserGrid {
 
       ArrayList<MarkerOptions> markerList=new ArrayList<MarkerOptions>();
       for(int i=0; i<markers.length(); i++) {
-          JSONArray data = null;
           try {
-              data = markers.getJSONArray(i);
-              Log.d("DATA",data.toString());
+              JSONArray data = markers.getJSONArray(i);
               String uuid = data.getString(0);
-              Log.d("GOT UUID",uuid);
               String name = data.getString(1);
 
               JSONObject location = data.getJSONObject(2);
-              LatLng latlng = new LatLng(location.getDouble("latitude"),location.getDouble("longitude"));
+              LatLng latlng = new LatLng(location.getDouble("latitude"), location.getDouble("longitude"));
 
               MarkerOptions marker = new MarkerOptions()
                       .position(latlng)
@@ -574,10 +435,9 @@ public class UserGrid {
                       .snippet(uuid);
               markerList.add(marker);
           } catch (JSONException e) {
-              e.printStackTrace();
+              return null;
           }
       }
-        Log.d("I got",markerList.toString());
       return markerList;
       }
 
@@ -586,35 +446,19 @@ public class UserGrid {
         String query = "select * where uuid="+restrauntID;
         JSONObject response=sendGet(entity,query);
 
-        //Extracting Restaurant Attributes Object
-        JSONArray entities = null;
+        JSONArray entities;
         try {
             entities = ((JSONArray)response.get("entities"));
         } catch (JSONException e) {
-            e.printStackTrace();
             return null;
         }
-        JSONObject restraunt = null;
+        JSONObject restaurant;
         try {
-            restraunt = (JSONObject) entities.get(0);
+            restaurant = (JSONObject) entities.get(0);
         } catch (JSONException e) {
-            e.printStackTrace();
             return null;
         }
-        return restraunt;
-    }
-
-    private String request(String query,String method){
-        URL obj;
-        try {
-            obj = new URL(baseUrl + query);
-            Log.d("Query",obj.toString());
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod(method);
-            return con.getResponseMessage();
-        }catch(Exception e){
-            return null;
-        }
+        return restaurant;
     }
 
     public String getUID(){
@@ -629,7 +473,29 @@ public class UserGrid {
         return accessToken;
     }
 
-    public  JSONObject sendGet(String entity,String query){
+    private JSONObject accumulate(String base,String[] types,String query) throws JSONException {
+        JSONObject response = new JSONObject();
+
+        for(String type : types)
+                response.accumulate(type, sendGet(base+type,query));
+
+        return response;
+    }
+
+    private String request(String query,String method){
+        URL url;
+        try {
+            url = new URL(baseUrl + query);
+            Log.d("Query", url.toString());
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod(method);
+            return con.getResponseMessage();
+        }catch(Exception e){
+            return null;
+        }
+    }
+
+    private  JSONObject sendGet(String entity,String query){
         try {
             String encodedURL=baseUrl + "/" + entity;
             if(query!=null)
@@ -640,8 +506,8 @@ public class UserGrid {
             URL url;
             try {
                 url = new URL(encodedURL);
+                Log.d("Query",url.toString());
             } catch (MalformedURLException e) {
-                System.out.println("Bad url");
                 return null;
             }
             HttpURLConnection con;
@@ -649,19 +515,15 @@ public class UserGrid {
                 con = (HttpURLConnection) url.openConnection();
 
             } catch (IOException e) {
-                System.out.println("No connection");
                 return null;
             }
             JSONObject results;
             try {
-                System.out.println(encodedURL);
                 InputStreamReader in = new InputStreamReader(con.getInputStream());
                 results= readStream(new BufferedReader(in));
             } catch (IOException e) {
-                System.out.println("No response  url: " + encodedURL);
                 return null;
             } catch (JSONException e) {
-                e.printStackTrace();
                 return null;
             } finally {
                 con.disconnect();
@@ -673,9 +535,9 @@ public class UserGrid {
 
     }
 
-    static public JSONObject readStream(BufferedReader in) throws IOException, JSONException {
+   private JSONObject readStream(BufferedReader in) throws IOException, JSONException {
         String inputLine;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
 
         while ((inputLine = in.readLine()) != null) {
             response.append(inputLine);
@@ -688,6 +550,7 @@ public class UserGrid {
         String temp = (baseUrl + query);
         System.out.println(temp);
         URL url = new URL(baseUrl + query);
+        Log.d("Query",url.toString());
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setDoOutput(true);
         con.setRequestProperty("Content-Type", "application/json");
