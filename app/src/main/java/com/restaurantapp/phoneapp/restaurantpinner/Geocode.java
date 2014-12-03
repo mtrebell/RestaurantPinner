@@ -76,16 +76,16 @@ public final class Geocode implements LocationListener {
         //Get listeners
         Location loc = null;
         if(gpsLoc) {
-            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             loc = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             //check for accuracy if want better
             if(loc==null){
-                manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+                manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
                 loc=manager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
         }
         else if(netLoc) {
-            manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+            manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
             loc=manager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         }
 
