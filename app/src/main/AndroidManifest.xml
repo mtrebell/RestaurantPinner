@@ -40,7 +40,7 @@
             android:name="com.restaurantapp.phoneapp.restaurantpinner.SearchActivity"
             android:label="@string/title_activity_search"
             android:parentActivityName="com.restaurantapp.phoneapp.restaurantpinner.MainActivity"
-            android:theme="@android:style/Theme.Holo.Dialog" >
+            android:theme="@android:style/Theme.Holo.Light.Dialog" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MyActivity" />
@@ -49,7 +49,7 @@
             android:name="com.restaurantapp.phoneapp.restaurantpinner.FilterActivity"
             android:label="@string/title_activity_filter"
             android:parentActivityName="com.restaurantapp.phoneapp.restaurantpinner.MainActivity"
-            android:theme="@android:style/Theme.Holo.Dialog" >
+            android:theme="@android:style/Theme.Holo.Light.Dialog" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MyActivity" />
@@ -58,7 +58,7 @@
             android:name="com.restaurantapp.phoneapp.restaurantpinner.NewPinActivity"
             android:label="@string/title_activity_addPin"
             android:parentActivityName="com.restaurantapp.phoneapp.restaurantpinner.MainActivity"
-            android:theme="@style/Dialog" >
+            android:theme="@android:style/Theme.Holo.Light.Dialog" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fix.myapplication.MyActivity" />
@@ -71,7 +71,7 @@
         <activity
             android:name="com.restaurantapp.phoneapp.restaurantpinner.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/Dialog">
+            android:theme="@android:style/Theme.Holo.Light.Dialog">
            <meta-data
                android:name="android.support.PARENT_ACTIVITY"
                android:value="com.example.fix.myapplication.MyActivity" />
@@ -91,8 +91,7 @@
         </activity>
         <activity
             android:name="com.restaurantapp.phoneapp.restaurantpinner.MapActivity"
-            android:label="@string/title_activity_map"
-            android:theme="@android:style/Theme.Dialog" >
+            android:label="@string/title_activity_map">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fix.myapplication.MyActivity" />
