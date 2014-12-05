@@ -39,7 +39,6 @@ public class NewPinActivity extends Activity {
 
     List<String> types;
     private String uuid;
-    UserGrid usergrid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +54,6 @@ public class NewPinActivity extends Activity {
          lat=extras.getDouble("lat");
          lng=extras.getDouble("lng");
         }
-
-        usergrid= ((MyApplication)getApplicationContext()).usergrid;
     }
 
 
@@ -169,6 +166,8 @@ public class NewPinActivity extends Activity {
 
         //Add Recomendations
     if(rec.isChecked()){
+        final UserGrid usergrid = ((MyApplication) getApplicationContext()).usergrid;
+
         new AsyncTask<Void,Void,HashMap<String,String>>(){
 
             @Override
@@ -205,12 +204,13 @@ public class NewPinActivity extends Activity {
 }
 
     public void addPin(List<String> friends){
-        new AsyncTask<String,Void,Void>() {
+        final UserGrid usergrid = ((MyApplication) getApplicationContext()).usergrid;
+       new AsyncTask<List<String>,Void,Void>() {
 
             @Override
-            protected Void doInBackground(String... friends) {
-                if(friends!=null && friends.length!=0)
-                    usergrid.addRecommendation(uuid,friends);
+            protected Void doInBackground(List<String>... friends) {
+                if(friends[0]!=null && !friends[0].isEmpty())
+                    usergrid.addRecommendation(uuid,friends[0]);
                 if(!types.isEmpty())
                     usergrid.addPin(uuid,types);
                 return null;
@@ -219,8 +219,7 @@ public class NewPinActivity extends Activity {
             protected void onPostExecute(Void voids) {
                 endTask();
             }
-
-        }.execute((String[])friends.toArray());
+        }.execute(friends);
     }
 
     private void endTask() {

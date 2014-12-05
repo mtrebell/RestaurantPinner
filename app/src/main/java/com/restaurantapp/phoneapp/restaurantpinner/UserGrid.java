@@ -195,7 +195,7 @@ public class UserGrid {
         return true;
     }
 
-    protected boolean requestFriend( String[] friends){
+    protected boolean requestFriend( List<String> friends){
         for(String friend:friends) {
             String query = "/users/" + friend + "/reqfriend/users/" + uId + "?access_token=" + accessToken;
             try {
@@ -302,7 +302,7 @@ public class UserGrid {
         return true;
     }
 
-    protected boolean addRecommendation(String restraunt, String[] users){
+    protected boolean addRecommendation(String restraunt, List<String> users){
         for(String user : users) {
             String query = "/users/" + user + "/recpin/restaurant/" + restraunt + "?access_token=" + accessToken;
             try {
@@ -316,7 +316,7 @@ public class UserGrid {
         return true;
     }
 
-    protected boolean removeRecomendation(String restraunt){
+    protected boolean removeRecommendation(String restraunt){
 
         String query;
 

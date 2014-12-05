@@ -234,14 +234,14 @@ public class FriendActivity extends Activity {
 
 
     private void addFriend(List<String> uuid) {
-        new AsyncTask<String,Void,Void>(){
+        new AsyncTask<List<String>,Void,Void>(){
 
             @Override
-            protected Void doInBackground(String... strings) {
-                usergrid.requestFriend(strings);
+            protected Void doInBackground(List<String>... strings) {
+                usergrid.requestFriend(strings[0]);
                 return null;
             }
-        }.execute((String[])uuid.toArray());
+        }.execute(uuid);
     }
 
     private void removeFriend(String uuid) {

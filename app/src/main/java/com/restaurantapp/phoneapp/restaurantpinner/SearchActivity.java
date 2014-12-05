@@ -19,7 +19,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 
 public class SearchActivity extends Activity {
-    UserGrid usergrid;
     double lat = -1, lng = -1;
 
     @Override
@@ -116,7 +115,7 @@ public class SearchActivity extends Activity {
         text = (EditText) findViewById(R.id.searchNam);
         final String name = text.getText().toString();
 
-        usergrid= ((MyApplication)getApplicationContext()).usergrid;
+        final UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
 
             new AsyncTask<Object,Void, ArrayList<MarkerOptions>>(){
 

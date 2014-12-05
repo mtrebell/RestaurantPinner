@@ -143,6 +143,7 @@ public class MainActivity extends FragmentActivity {
             case R.id.action_changeview:
                 search = !search;
                 displayPins();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);

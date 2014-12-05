@@ -224,7 +224,7 @@ public class NotificationActivity extends Activity {
                 List<String> pin = new ArrayList<String>();
                 pin.add(UserGrid.REC);
                 usergrid.addPin(strings[0],pin);
-                usergrid.removeRecomendation(strings[0]);
+                usergrid.removeRecommendation(strings[0]);
                 return null;
             }
         }.execute(restaurant);
@@ -236,7 +236,7 @@ public class NotificationActivity extends Activity {
 
             @Override
             protected Void doInBackground(String... strings) {
-                usergrid.removeRecomendation(strings[0]);
+                usergrid.removeRecommendation(strings[0]);
                 return null;
             }
         }.execute(restaurant);
