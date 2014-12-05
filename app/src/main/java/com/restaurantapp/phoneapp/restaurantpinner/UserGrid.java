@@ -1,5 +1,5 @@
 //Decide if handling exceptions in request functions or outside of them
-//Handle fail in deletes
+//Handle fail in delete
 
 package com.restaurantapp.phoneapp.restaurantpinner;
 
@@ -25,7 +25,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class UserGrid {
-    public final static String FAV = "fav", WISH="wishlist",REC="reccomend",LIKE="like",DIS="dislike";
+    public static final String FAV = "fav", WISH="wishlist",REC="reccomend",LIKE="like",DIS="dislike";
+    public int limit = 50; //By default usergrid returns 10 results
     private String baseUrl;
     private String accessToken;
     private String uId;
@@ -44,7 +45,7 @@ public class UserGrid {
     }
 
     /*------------------------------Account Functions--------------------------------*/
-    public boolean login(String user,String password){
+    protected boolean login(String user,String password){
         String query = "token?grant_type=password&username="+user+"&password="+password;
             JSONObject response = sendGet(query,null);
             if(response == null) {
@@ -63,7 +64,7 @@ public class UserGrid {
         }
     }
 
-    public boolean logout(String user){
+    protected boolean logout(String user){
         String query = "/users/"+user+"/revoketokens?access_token="+accessToken;
         try {
             sendPut(query, null);
@@ -78,7 +79,7 @@ public class UserGrid {
         return true;
     }
 
-    public boolean chgPassword(String user,String oldPass,String newPass){
+    protected boolean chgPassword(String user,String oldPass,String newPass){
         String query = "/users/"+user+"/password";
         String params = "{\"newpassword\":" + newPass + ",\"oldPassword\":" + oldPass +"}";
 
@@ -93,7 +94,7 @@ public class UserGrid {
         return true;
     }
 
-    public boolean addAccount(String username,String pass,String email){
+    protected boolean addAccount(String username,String pass,String email){
         String query = "/users";
         String params = "{\"username\":\""+ username + "\",\"password\":\""+ pass + "\",\"email\":\"" + email +"\"}";
 
@@ -109,7 +110,7 @@ public class UserGrid {
         return true;
     }
 
-    public boolean deleteAccount(String username)
+    protected boolean deleteAccount(String username)
     {
         String query = "/users/"+username+"?access_token="+accessToken;
         request(query, "DELETE");
@@ -117,21 +118,21 @@ public class UserGrid {
     }
 
     /*---------------------Friends Functions--------------------*/
-    public HashMap<String,String> searchUser(String username){
-        String entity ="/users?ql=";
+    protected HashMap<String,String> searchUser(String username){
+        String entity ="/users?limit='"+limit+"'&ql=";
         String query = "select uuid,username,email where username= '"+username + "*'";
         JSONObject response = sendGet(entity,query);
         return userParse(response);
     }
 
-    public HashMap<String,String> getFriends(){
-        String entity = "users/"+uId+"/friends?ql=";
+    protected HashMap<String,String> getFriends(){
+        String entity = "users/"+uId+"/friends?limit='"+limit+"'&ql=";
         String query = "select uuid,username,email";
         JSONObject response = sendGet(entity,query);
         return userParse(response);
     }
 
-    public HashMap<String,String> userParse(JSONObject response){
+    private HashMap<String,String> userParse(JSONObject response){
         HashMap<String,String> users = new HashMap<String,String>();
         JSONArray friends;
 
@@ -171,7 +172,7 @@ public class UserGrid {
         return users;
     }
 
-    public boolean addFriend( String friend){
+    protected boolean addFriend( String friend){
         String query = "/users/" + uId + "/friends/users/"+friend+"?access_token="+accessToken;
         try {
             sendPut(query,null);
@@ -183,13 +184,13 @@ public class UserGrid {
         return true;
     }
 
-    public boolean removeFriend( String friend){
+    protected boolean removeFriend( String friend){
         String query = "/users/" + uId + "/friends/"+friend+"?access_token="+accessToken;
         request(query,"DELETE");
         return true;
     }
 
-    public boolean requestFriend( List<String> friends){
+    protected boolean requestFriend( String[] friends){
         for(String friend:friends) {
             String query = "/users/" + friend + "/reqfriend/users/" + uId + "?access_token=" + accessToken;
             try {
@@ -203,19 +204,19 @@ public class UserGrid {
         return true;
     }
 
-    public boolean removeRequestFriend( String friend){
+    protected boolean removeRequestFriend( String friend){
         String query = "/users/" + uId + "/reqfriend/users/"+friend+"?access_token="+accessToken;
         request(query,"DELETE");
         return true;
     }
 
     /*-----------------Pin Functions--------------*/
-    public HashMap<String, Pin> getPins(){
+    protected HashMap<String, Pin> getPins(){
         HashMap<String,Pin> pins = new HashMap<String,Pin>();
         JSONObject data;
 
         String base = "/users/" + uId + "/";
-        String query = "?ql=select uuid,name,address,location";
+        String query = "select uuid,name,address,location";
         String[] types = {DIS,WISH,REC,FAV,LIKE};
 
         try {
@@ -223,31 +224,32 @@ public class UserGrid {
         } catch (JSONException e) {
             return null;
         }
-
+        Log.d("DATA:",data.toString());
         Iterator<String> keys = data.keys();
-
         while(keys.hasNext()){
            String key = keys.next();
+            Log.d("DATA:",key);
             JSONArray restaurants;
             try {
-                restaurants = (JSONArray)((JSONObject) data.get(key)).get("list");
+                restaurants = (JSONArray)((JSONObject) data.get(key)).get("entities");
             } catch (JSONException e) {
+                e.printStackTrace();
                 return null;
             }
 
             for(int i=0;i<restaurants.length();i++){
                 try {
-                    String uuid =restaurants.getJSONArray(i).getString(0);
-                    String name = restaurants.getJSONArray(i).getString(1);
+                    String uuid =restaurants.getJSONObject(i).getString("uuid");
+                    String name = restaurants.getJSONObject(i).getString("name");
 
                     StringBuilder address =new StringBuilder();
-                    JSONArray add = restaurants.getJSONArray(i).getJSONArray(2);
+                    JSONArray add = restaurants.getJSONObject(i).getJSONArray("address");
                     for(int j=0;j<add.length()-1;j++){ //Skip Province and Country
                         address.append(add.getString(j));
                         address.append(" ");
                     }
 
-                    JSONObject latlng = restaurants.getJSONArray(i).getJSONObject(3);
+                    JSONObject latlng = restaurants.getJSONObject(i).getJSONObject("location");
                     Double lat = latlng.getDouble("latitude");
                     Double lng = latlng.getDouble("longitude");
 
@@ -270,7 +272,7 @@ public class UserGrid {
         return pins;
     }
 
-    public boolean addPin(String restaurant,List<String> pinType){
+    protected boolean addPin(String restaurant,List<String> pinType){
         String query;
 
         for(String pin:pinType) {
@@ -287,7 +289,7 @@ public class UserGrid {
         return true;
     }
 
-    public boolean removePin(String restaurant,List<String> pinType){
+    protected boolean removePin(String restaurant,List<String> pinType){
         for(String pin:pinType) {
             String query = "/users/" +uId +"/"+ pin + "/restaurants/" + restaurant+"?access_token="+accessToken;
             request(query,"DELETE");
@@ -295,7 +297,7 @@ public class UserGrid {
         return true;
     }
 
-    public boolean addRecommendation(String restraunt, List<String> users){
+    protected boolean addRecommendation(String restraunt, String[] users){
         for(String user : users) {
             String query = "/users/" + user + "/recpin/restaurant/" + restraunt + "?access_token=" + accessToken;
             try {
@@ -309,7 +311,7 @@ public class UserGrid {
         return true;
     }
 
-    public boolean removeRecomendation(String restraunt){
+    protected boolean removeRecomendation(String restraunt){
 
         String query;
 
@@ -320,17 +322,16 @@ public class UserGrid {
     }
 
     /*-------------------------Notification Functions----------------------*/
-    public HashMap<String,Notification> getNotifications(){
+    protected HashMap<String,Notification> getNotifications(){
         HashMap<String,Notification> notifications = new HashMap<String, Notification>();
 
         try {
 
             String base = "/users/" + uId + "/";
-            String query = "?ql=select uuid,name,email";
-            String[] types = {"recpin","friends"};
+            String query = "select uuid,name,email";
+            String[] types = {"recpin","reqfriend"};
 
             JSONObject response = accumulate(base,types,query);
-
             Iterator<String> keys = response.keys();
             while (keys.hasNext()){
                 String uuid;
@@ -338,37 +339,39 @@ public class UserGrid {
                 int type;
 
                 String key = keys.next();
-                JSONArray data = response.getJSONObject(key).getJSONArray("list");
+                JSONArray data = response.getJSONObject(key).getJSONArray("entities");
 
-                if(key.equals("pin"))
+                if(key.equals("recpin"))
                     type = Notification.PIN;
                 else
                     type = Notification.FRIEND;
 
                 for (int i = 0; i < data.length(); i++) {
 
-                        JSONArray notification = data.getJSONArray(i);
-                        uuid = notification.getString(0);
-                        name = notification.getString(1);
+                        JSONObject notification = data.getJSONObject(i);
+                        Log.d("DATA:",notification.toString());
+                        uuid = notification.getString("uuid");
+                        name = notification.getString("name");
+                        Log.d("DATA:",uuid);
+                        Log.d("DATA:",name);
 
                         if(type == Notification.PIN) {
                             StringBuilder address = new StringBuilder();
-                            JSONArray add = notification.getJSONArray(2);
-
-                            for (int j = 0; j < add.length() - 2; j++) {
+                            JSONArray add = notification.getJSONArray("address");
+                            Log.d("GOT HERE","---------");
+                            for (int j = 0; j < add.length(); j++) {
                                 address.append(add.getString(j));
                             }
-
+                            Log.d("DATA:",address.toString());
                             notifications.put(uuid,new Notification(type,uuid,name,address.toString()));
                         }
 
                         else{
-                            String address  = notification.getString(2);
+                            String address  = notification.getString("email");
                             notifications.put(uuid,new Notification(type,uuid,name,address));
+                            Log.d("DATA:",address);
                         }
                     }
-
-
             }
         }catch(Exception e){
             return null;
@@ -377,22 +380,23 @@ public class UserGrid {
         return notifications;
     }
 
-    public ArrayList<MarkerOptions> restaurantSearch(String name, double lat, double lon, double km, boolean pinsOnly){
+    /*-------------------Restraunt Functions----------------------*/
+
+    protected ArrayList<MarkerOptions> restaurantSearch(String name, double lat, double lon, double km, boolean pinsOnly){
         String entity;
         String query;
 
         if(pinsOnly){
-            entity=uId+"/pin?ql=";
+            entity=uId+"/pin?limit='"+limit+"'&ql=";
             query="select uuid,name,location";
         }
-
         else{
-            entity="/restaurants?ql=";
+            entity="/restaurants?limit='"+limit+"'&ql=";
             query= "select uuid,name,location";
         }
 
         if(!name.isEmpty()){
-            query+=" where name_index contains \'"+ name + "\'";
+            query+=" where name_index contains '"+ name + "*'";
         }
 
         if(lat !=-1){
@@ -402,7 +406,6 @@ public class UserGrid {
             if(km!=-0) {
                 query += " location within " + km * 1000 + " of " + lat + ',' + lon;
             }
-
             else
                 query+=" location within 750 of " + lat + ',' + lon;
         }
@@ -410,14 +413,17 @@ public class UserGrid {
         JSONObject response = sendGet(entity,query);
         JSONArray data;
         try {
-            data = response.getJSONArray("list");
+            if(response!=null)
+                data = response.getJSONArray("list");
+            else
+                return null;
         } catch (JSONException e) {
             return null;
         }
        return buildMarkers(data);
     }
 
-    public ArrayList<MarkerOptions> buildMarkers(JSONArray markers){
+    private ArrayList<MarkerOptions> buildMarkers(JSONArray markers){
 
       ArrayList<MarkerOptions> markerList=new ArrayList<MarkerOptions>();
       for(int i=0; i<markers.length(); i++) {
@@ -441,7 +447,7 @@ public class UserGrid {
       return markerList;
       }
 
-    public JSONObject restaurantInfo(String restrauntID){
+    protected JSONObject restaurantInfo(String restrauntID){
         String entity = "/restaurants?ql=";
         String query = "select * where uuid="+restrauntID;
         JSONObject response=sendGet(entity,query);
@@ -461,24 +467,24 @@ public class UserGrid {
         return restaurant;
     }
 
-    public String getUID(){
+    /*---------------------------Helper Functions-------------------------*/
+    protected String getUID(){
         return uId;
     }
 
-    public String getBaseUrl(){
+    protected String getBaseUrl(){
         return baseUrl;
     }
 
-    public String getAccessToken(){
+    protected String getAccessToken(){
         return accessToken;
     }
 
     private JSONObject accumulate(String base,String[] types,String query) throws JSONException {
         JSONObject response = new JSONObject();
-
+        String limitString = "?limit='"+limit+"'";
         for(String type : types)
-                response.accumulate(type, sendGet(base+type,query));
-
+                response.accumulate(type, sendGet(base+type+limitString,"&ql="+query));
         return response;
     }
 

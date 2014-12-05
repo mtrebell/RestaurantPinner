@@ -1,17 +1,10 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-/**
- * Created by fix on 17/11/2014.
- */
 
     public class HashMapAdapter extends BaseAdapter {
 
@@ -40,25 +33,16 @@ import android.widget.TextView;
 
         @Override
         public View getView(int pos, View convertView, ViewGroup parent) {
-            String key = keys[pos];
-            String Value = getItem(pos).toString();
-
-            //do view stuff here
             if(convertView==null)
-                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_friends, parent, false);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_item, parent, false);
 
-            //Use list_friends format, hide delete button
-            Button delete = (Button)convertView.findViewById(R.id.delete);
-            TextView email = (TextView)convertView.findViewById(R.id.txtSub);
-            TextView username = (TextView)convertView.findViewById(R.id.txtTitle);
+            TextView sub = (TextView)convertView.findViewById(R.id.txtSub);
+            TextView title = (TextView)convertView.findViewById(R.id.txtTitle);
 
-            delete.setVisibility(View.INVISIBLE);
-            email.setText(users.get(keys[pos]));
-            username.setText(keys[pos]);
+            sub.setText(users.get(keys[pos]));
+            title.setText(keys[pos]);
 
             return convertView;
         }
-
-
     }
 

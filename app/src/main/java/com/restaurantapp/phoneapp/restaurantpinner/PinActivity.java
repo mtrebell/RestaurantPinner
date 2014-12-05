@@ -1,44 +1,30 @@
+//Editmode and change are repaticous
+
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 
 public class PinActivity extends Activity {
 
@@ -47,28 +33,27 @@ public class PinActivity extends Activity {
     Boolean editMode;
     PinAdapter adapter;
     ListView lv;
+    List<String> add = new ArrayList<String>();
+    List<String> remove = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
         lv = (ListView) findViewById(R.id.list);
+        lv.setItemsCanFocus(false);
         usergrid = ((MyApplication) getApplicationContext()).usergrid;
         editMode = false;
 
-
-        //Load Pins
         new AsyncTask<Void, Void, HashMap<String, Pin>>() {
 
             @Override
             protected HashMap<String, Pin> doInBackground(Void... voids) {
-                HashMap<String, Pin> pins = usergrid.getPins();
-                return pins;
+                return usergrid.getPins();
             }
 
             @Override
             protected void onPostExecute(HashMap<String, Pin> result) {
-                //display pins
                 if (result != null)
                     displayPins(result);
             }
@@ -78,7 +63,6 @@ public class PinActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_pin, menu);
         return true;
     }
@@ -86,18 +70,15 @@ public class PinActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Log.d("Edit was Clicked", "Changing view...");
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_edit) {
-            Log.d("Edit was Clicked", "Changing view...");
             changeButtons();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     public void changeButtons() {
         editMode = !editMode;
+
         if (editMode)
             lv.setOnItemClickListener(null);
 
@@ -108,7 +89,6 @@ public class PinActivity extends Activity {
         adapter.notifyDataSetChanged();
     }
 
-
     public void displayPins(HashMap<String, Pin> result) {
         pins = result;
         adapter = new PinAdapter(pins);
@@ -117,8 +97,7 @@ public class PinActivity extends Activity {
         if (editMode)
             lv.setOnItemClickListener(null);
         else
-         lv.setOnItemClickListener(new pinClickListener());
-
+            lv.setOnItemClickListener(new pinClickListener());
 
         adapter.notifyDataSetChanged();
     }
@@ -132,23 +111,24 @@ public class PinActivity extends Activity {
                 usergrid.removePin(restaurant, delete);
                 return null;
             }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                adapter.notifyDataSetChanged();
+            }
         }.execute();
 
     }
 
     public class pinClickListener implements AdapterView.OnItemClickListener {
 
-
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             String restaurant = adapter.getId(i);
-            Log.d("GOT HERE","ITEM CLICKED.....");
-            //get data
             new AsyncTask<String, Void, JSONObject>() {
 
                 @Override
                 protected JSONObject doInBackground(String... strings) {
-                    Log.d("GOT HERE","GETTING INFO.....");
                     return usergrid.restaurantInfo(strings[0]);
                 }
 
@@ -157,17 +137,14 @@ public class PinActivity extends Activity {
                     openMap(json.toString());
                 }
             }.execute(restaurant);
-
         }
     }
 
     private  void openMap(String data){
-        Log.d("I got",data);
         Intent intent = new Intent(PinActivity.this,MapActivity.class);
         intent.putExtra("data",data);
         startActivity(intent);
     }
-
 
     public class PinAdapter extends BaseAdapter {
 
@@ -205,7 +182,7 @@ public class PinActivity extends Activity {
         @Override
         public View getView(int pos, View convertView, final ViewGroup parent) {
             final String key = keys.get(pos);
-            String Value = getItem(pos).toString();
+            Pin restaurant = data.get(key);
 
             if (convertView == null)
                 convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_friends, parent, false);
@@ -214,14 +191,10 @@ public class PinActivity extends Activity {
             TextView name = (TextView) convertView.findViewById(R.id.txtTitle);
             ImageView icon = (ImageView) convertView.findViewById(R.id.imgIcon);
 
-            //May add address
-            // address.setText(users.get(keys[pos]));
-            Pin restraunt = data.get(keys.get(pos));
-            name.setText(restraunt.name);
-            address.setText(restraunt.address);
+            name.setText(restaurant.name);
+            address.setText(restaurant.address);
 
-            //Add address
-            //Add ICON
+
             Button delete = (Button) convertView.findViewById(R.id.delete);
             Button edit = (Button) convertView.findViewById(R.id.edit);
 
@@ -231,7 +204,6 @@ public class PinActivity extends Activity {
                         new Button.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Integer i = (Integer) view.getTag();
                                 removePin(pins.get(key));
                                 data.remove(key);
                                 keys.remove(key);
@@ -240,8 +212,6 @@ public class PinActivity extends Activity {
                         }
                 );
                 delete.setVisibility(View.VISIBLE);
-
-                //Set edit button
 
                 edit.setOnClickListener(
                         new Button.OnClickListener() {
@@ -256,19 +226,27 @@ public class PinActivity extends Activity {
                 edit.setVisibility(View.INVISIBLE);
                 delete.setVisibility(View.INVISIBLE);
             }
-
-
-            //Set image according to first pin
-            String ic = data.get(keys.get(pos)).types.get(0);
-            Resources r = getResources();
-            r.getIdentifier("ic_" + ic, "drawable", getPackageName());
-            icon.setImageResource(r.getIdentifier("ic_" + ic, "drawable", getPackageName()));
+            List<String> types = restaurant.types;
+            if(types.contains(UserGrid.DIS))
+                icon.setImageResource(R.drawable.ic_action_bad);
+            else if(types.contains(UserGrid.WISH))
+                icon.setImageResource(R.drawable.ic_action_important);
+            else if(types.contains(UserGrid.REC))
+                icon.setImageResource(R.drawable.ic_action_person);
+            else if(types.contains(UserGrid.FAV))
+                icon.setImageResource(R.drawable.ic_action_favorite);
+            else
+                icon.setImageResource(R.drawable.ic_action_good);
 
             return convertView;
         }
 
         public void setEdit(Boolean value) {
             editMode = value;
+        }
+
+        public boolean getEdit(){
+            return editMode;
         }
     }
 
@@ -284,7 +262,6 @@ public class PinActivity extends Activity {
         }.execute(pin);
     }
 
-
     public class editDialog {
         Pin restaurant;
 
@@ -294,7 +271,7 @@ public class PinActivity extends Activity {
 
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
             LayoutInflater inflater = getLayoutInflater();
-            View convertView = (View) inflater.inflate(R.layout.edit_dialog, null);
+            View convertView = inflater.inflate(R.layout.edit_dialog, null);
             alertDialog.setView(convertView);
             alertDialog.setTitle("Confirm Restaurant");
             alertDialog.setPositiveButton("Update", new DialogInterface.OnClickListener() {
@@ -330,9 +307,6 @@ public class PinActivity extends Activity {
         }
 
     }
-
-    List<String> add = new ArrayList<String>();
-    List<String> remove = new ArrayList<String>();
 
     public void onToggleClick(View view) {
         boolean on = ((ToggleButton) view).isChecked();

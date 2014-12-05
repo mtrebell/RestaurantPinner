@@ -1,11 +1,7 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Created by fix on 17/11/2014.
- */
 public class Pin {
     public double lat,lng;
     public String uuid,name,address;

@@ -13,13 +13,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -136,9 +132,8 @@ public class NewPinActivity extends Activity {
                             return null;
                         }
 
-                        ArrayList<MarkerOptions> restaurant = usergrid.restrauntSearch("", lat, lng, 0, false);
+                        return usergrid.restaurantSearch("", lat, lng, 0, false);
 
-                        return restaurant;
                     }
 
                     protected void onPostExecute(ArrayList<MarkerOptions> result) {
@@ -178,17 +173,30 @@ public class NewPinActivity extends Activity {
 
             @Override
             protected HashMap<String, String> doInBackground(Void... voids) {
-                HashMap<String,String> friends = usergrid.getFriends();
-                return friends;
+                return usergrid.getFriends();
             }
 
             protected void onPostExecute(HashMap<String,String> results){
                 if(results!=null){
-                    new FriendsDialog(results,NewPinActivity.this);
+                    new FriendDialog(results, NewPinActivity.this) {
+                        @Override
+                        protected void setButtons() {
+                            alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    addPin(friends);
+                                }
+                            });
+                            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    endTask();
+                                }
+                            });
+                        }
+                    };
                 }
                 else {
-                    Toast msg = Toast.makeText(NewPinActivity.this,"No Friends found",Toast.LENGTH_SHORT);
-                    //Add pin to the map.
                      addPin(null);
                 }
             }
@@ -197,13 +205,11 @@ public class NewPinActivity extends Activity {
 }
 
     public void addPin(List<String> friends){
-        new AsyncTask<List<String>,Void,Void>() {
+        new AsyncTask<String,Void,Void>() {
 
             @Override
-            protected Void doInBackground(List<String>... prams) {
-                Log.d("Adding pin","------------");
-                List<String> friends = prams[0];
-                if(friends!=null && !friends.isEmpty())
+            protected Void doInBackground(String... friends) {
+                if(friends!=null && friends.length!=0)
                     usergrid.addRecommendation(uuid,friends);
                 if(!types.isEmpty())
                     usergrid.addPin(uuid,types);
@@ -211,11 +217,10 @@ public class NewPinActivity extends Activity {
             }
 
             protected void onPostExecute(Void voids) {
-                //OnCopmlete close windows.....
                 endTask();
             }
 
-        }.execute(friends);
+        }.execute((String[])friends.toArray());
     }
 
     private void endTask() {
@@ -235,10 +240,11 @@ public class NewPinActivity extends Activity {
         ListView lv;
         public int selected =0;
 
+
         public ConfirmDialog(ArrayList<MarkerOptions> restaurants,Context context) {
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
             LayoutInflater inflater = getLayoutInflater();
-            View convertView = (View) inflater.inflate(R.layout.fragment_item_list, null);
+            View convertView = inflater.inflate(R.layout.fragment_item_list, null);
             alertDialog.setView(convertView);
             alertDialog.setTitle("Confirm Restaurant");
 
@@ -260,7 +266,8 @@ public class NewPinActivity extends Activity {
             });
 
             lv = (ListView) convertView.findViewById(R.id.list);
-
+            lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+            lv.setSelector(R.drawable.selected);
             adapter = new MarkerAdapter(context, android.R.layout.simple_list_item_1, restaurants);
             lv.setAdapter(adapter);
 
@@ -268,64 +275,11 @@ public class NewPinActivity extends Activity {
                 @Override
                 public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
                     selected = position;
-                    Log.d("SELECTED",""+position);
                 }
             });
 
             alertDialog.show();
         }
-    }
-
-    public class FriendsDialog {
-        HashMapAdapter adapter;
-        ListView lv;
-        public int selected;
-        String username;
-        List<String> friends;
-
-        public FriendsDialog(HashMap<String,String> users,Context context) {
-            friends = new ArrayList<String>();
-
-            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-            LayoutInflater inflater = getLayoutInflater();
-            View convertView = (View) inflater.inflate(R.layout.fragment_item_list, null);
-            alertDialog.setView(convertView);
-            alertDialog.setTitle("Choose Friend(s)");
-
-            alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    addPin(friends);
-                }
-
-            });
-            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    endTask();
-                }
-            });
-
-            lv = (ListView) convertView.findViewById(R.id.list);
-            lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
-                    String friend = adapter.getItem(position);
-                    if(friends.contains(friend))
-                        friends.remove(friend);
-                    else
-                        friends.add(friend);
-                }
-            });
-
-            adapter = new HashMapAdapter(users);
-            lv.setAdapter(adapter);
-
-            alertDialog.show();
-        }
-
     }
 
     public void setuuid(String uuid){

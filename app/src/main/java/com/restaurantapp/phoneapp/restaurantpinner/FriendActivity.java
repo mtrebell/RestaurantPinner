@@ -1,8 +1,10 @@
+//Maybe view with an editMode
+//EDITMODE IS REDUNDENT
+
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,19 +14,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 public class FriendActivity extends Activity {
 
@@ -32,6 +31,7 @@ public class FriendActivity extends Activity {
     Boolean editMode;
     FriendAdapter adapter;
     ListView lv;
+    AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +40,7 @@ public class FriendActivity extends Activity {
         lv = (ListView) findViewById(R.id.list);
         usergrid= ((MyApplication)getApplicationContext()).usergrid;
         editMode=false;
+        dialog =null;
         //Add friend button
 
         //Load Friends
@@ -47,8 +48,7 @@ public class FriendActivity extends Activity {
 
             @Override
             protected HashMap<String, String> doInBackground(Void... voids) {
-                HashMap<String,String> friends = usergrid.getFriends();
-                return friends;
+                return usergrid.getFriends();
             }
 
             @Override
@@ -64,7 +64,7 @@ public class FriendActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_pin, menu);
+        getMenuInflater().inflate(R.menu.menu_friend, menu);
         return true;
     }
 
@@ -76,6 +76,7 @@ public class FriendActivity extends Activity {
                     searchDialog();
                     return true;
                 case R.id.action_home:
+                    //return home
                     return true;
                 default:
                     return false;
@@ -107,35 +108,26 @@ public class FriendActivity extends Activity {
                         })
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id) {
-                                dialog.cancel();
+                            public void onClick(DialogInterface d,int id) {
+                                dialog =null;
+                                d.cancel();
                             }
                         });
 
       AlertDialog alertDialog = alertDialogBuilder.create();
+        dialog = alertDialog;
         alertDialog.show();
     }
 
-
-    public void onClick(View view){
-        switch (view.getId()){
-            case R.id.edit:
-                changeButtons();
-                break;
-        }
-    }
-
-    public void changeButtons(){
-        editMode=!editMode;
-        adapter.setEdit(editMode);
-        adapter.notifyDataSetChanged();
-    }
-
     public void displayFriends(HashMap<String,String> result){
-        Log.d("GOT HERE",result.toString());
         adapter = new FriendAdapter(result);
         lv.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+
+    public void notFoundMsg(){
+        Toast.makeText(this,"Could Not Find User",Toast.LENGTH_SHORT).show();
+        searchDialog();
     }
 
     public class FriendAdapter extends BaseAdapter{
@@ -167,53 +159,34 @@ public class FriendActivity extends Activity {
             return 0;
         }
 
-        public String getId(int i) {
-            return keys.get(i);
-        }
-
         @Override
         public View getView(int pos, View convertView, ViewGroup parent) {
-            String key = keys.get(pos);
-            String Value = getItem(pos).toString();
+            final String key = keys.get(pos);
 
             if(convertView==null)
                 convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_friends, parent, false);
 
             TextView address = (TextView)convertView.findViewById(R.id.txtSub);
             TextView name = (TextView)convertView.findViewById(R.id.txtTitle);
-            ImageView icon = (ImageView)convertView.findViewById(R.id.imgIcon);
+            Button delete = (Button)convertView.findViewById(R.id.delete);
+            Button edit = (Button)convertView.findViewById(R.id.edit);
 
-            String friend =data.get(keys.get(pos));
-            name.setText(friend);
-            address.setText(keys.get(pos));
+            String email =data.get(keys.get(pos));
+            name.setText(keys.get(pos));
+            address.setText(email);
+            edit.setVisibility(View.GONE);
 
-            //Add ICON
-
-            if(editMode) {
-                Button delete = (Button) convertView.findViewById(R.id.delete);
-                delete.setOnClickListener(
-                        new Button.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Integer i = (Integer) view.getTag();
-                                removeFriend(keys.get(i));
-                                data.remove(keys.get(i));
-                                keys.remove(i);
-                                notifyDataSetChanged();
-                            }
-                        }
-                );
-
-            }
-
-            //Friends icon
-            //icon.setImageResource(r.getIdentifier("ic_"+ic, "drawable", getPackageName()));
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    removeFriend(key);
+                    data.remove(key);
+                    keys.remove(key);
+                    notifyDataSetChanged();
+                }
+            });
 
             return convertView;
-        }
-
-        public void setEdit(boolean mode){
-            editMode=mode;
         }
 
     }
@@ -229,83 +202,47 @@ public class FriendActivity extends Activity {
             @Override
             protected void onPostExecute(HashMap<String, String> result) {
                 if(result!=null && !result.isEmpty()){
-                    friendDialog(result);
+                    new FriendDialog(result,FriendActivity.this){
+
+                        @Override
+                        protected void setButtons() {
+                            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialog=null;
+                                    dialogInterface.cancel();
+                                }
+                            });
+                            alertDialog.setPositiveButton("Add",new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Log.d("Friends",friends.toString());
+                                    addFriend(friends);
+                                }
+                            });
+                        }
+                    };
                 }
                 //Else error msg
+                else
+                    notFoundMsg();
                 //Back to search dialog
             }
         }.execute(name);
     }
 
 
-    public class FriendsDialog {
-        HashMapAdapter adapter;
-        ListView lv;
-        public int selected;
-        String username;
-        List<String> friends;
-
-        public FriendsDialog(HashMap<String,String> users,Context context) {
-            friends = new ArrayList<String>();
-
-            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-            LayoutInflater inflater = getLayoutInflater();
-            View convertView = (View) inflater.inflate(R.layout.fragment_item_list, null);
-            alertDialog.setView(convertView);
-            alertDialog.setTitle("Choose Friend(s)");
-
-            alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    addFriend(friends);
-                }
-
-            });
-            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            });
-
-            lv = (ListView) convertView.findViewById(R.id.list);
-            lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
-                    String friend = adapter.getItem(position);
-                    if(friends.contains(friend))
-                        friends.remove(friend);
-                    else
-                        friends.add(friend);
-                }
-            });
-
-            adapter = new HashMapAdapter(users);
-            lv.setAdapter(adapter);
-
-            alertDialog.show();
-        }
-
-    }
-
-    public void friendDialog(HashMap<String,String> result){
-        new FriendsDialog(result,this);
-    }
 
     private void addFriend(List<String> uuid) {
-        new AsyncTask<List<String>,Void,Void>(){
+        new AsyncTask<String,Void,Void>(){
 
             @Override
-            protected Void doInBackground(List<String>... strings) {
-                usergrid.requestFriend(strings[0]);
+            protected Void doInBackground(String... strings) {
+                usergrid.requestFriend(strings);
                 return null;
             }
-        }.execute(uuid);
+        }.execute((String[])uuid.toArray());
     }
-
-
 
     private void removeFriend(String uuid) {
         new AsyncTask<String,Void,Void>(){
@@ -316,5 +253,14 @@ public class FriendActivity extends Activity {
                 return null;
             }
         }.execute(uuid);
+    }
+
+    @Override
+    protected void onStop() {
+        if (dialog != null){
+            dialog.dismiss();
+            dialog=null;
+    }
+        super.onPause();
     }
 }

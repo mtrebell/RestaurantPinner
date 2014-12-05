@@ -1,42 +1,32 @@
+//EDITMODE CONTROLS ARE REPETITIVE
+
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.Activity;
-import android.app.ListActivity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 
 public class NotificationActivity extends Activity {
 
     UserGrid usergrid;
-    HashMap<String,Pin> pins;
     NotAdapter adapter;
     ListView lv;
+    Boolean editMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +34,47 @@ public class NotificationActivity extends Activity {
         setContentView(R.layout.list);
         lv = (ListView) findViewById(R.id.list);
         usergrid= ((MyApplication)getApplicationContext()).usergrid;
+        editMode =false;
 
+        getNotifications();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_pin, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_edit) {
+            changeButtons();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void changeButtons() {
+        editMode = !editMode;
+        if (editMode)
+            lv.setOnItemClickListener(null);
+
+        //else
+            //notification clickListener
+        //if friend display details
+        //if map display like in PINACTIVITY
+
+        adapter.setEdit(editMode);
+        adapter.notifyDataSetChanged();
+    }
+
+    public void getNotifications(){
         new AsyncTask<Void, Void, HashMap<String, Notification>>() {
 
             @Override
             protected HashMap<String, Notification> doInBackground(Void... voids) {
-                HashMap<String,Notification> friends = usergrid.getNotifications();
-                return friends;
+                return usergrid.getNotifications();
             }
 
             @Override
@@ -59,33 +83,9 @@ public class NotificationActivity extends Activity {
                     displayNotifications(result);
             }
         }.execute();
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_pin, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void onClick(View view){
     }
 
     public void displayNotifications(HashMap<String,Notification> result){
-        Log.d("GOT HERE",result.toString());
         adapter = new NotAdapter(result);
         lv.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -120,61 +120,74 @@ public class NotificationActivity extends Activity {
             return 0;
         }
 
-        public String getId(int i) {
-            return keys.get(i);
-        }
-
         @Override
         public View getView(int pos, View convertView, ViewGroup parent) {
-            String key = keys.get(pos);
-            final Notification value = (Notification)getItem(pos);
+            final String key = keys.get(pos);
+            final Notification value = data.get(key);
 
             if(convertView==null)
-                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_friends, parent, false);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification, parent, false);
 
             TextView text = (TextView)convertView.findViewById(R.id.text);
             ImageView icon = (ImageView)convertView.findViewById(R.id.imgIcon);
-            ImageButton delete = (ImageButton) convertView.findViewById(R.id.remove);
-            ImageButton confirm = (ImageButton) convertView.findViewById(R.id.confirm);
 
             if(value.type==Notification.FRIEND){
                 icon.setImageResource(R.drawable.ic_action_add_person);
-                text.setText("New friend request from " + value.restaurantName);
+                text.setText("New friend request from " + value.uuid);
             }
             else{
                 icon.setImageResource(R.drawable.ic_action_newpin);
-                text.setText("New Reccomendation: " + value.restaurantName);
+                text.setText("New Recommendation: " + value.name);
             }
 
-            confirm.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            ImageButton delete = (ImageButton) convertView.findViewById(R.id.remove);
+            ImageButton confirm = (ImageButton) convertView.findViewById(R.id.confirm);
 
-                }
-            });
+            if(editMode) {
+                delete.setVisibility(View.VISIBLE);
+                delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        data.remove(key);
+                        keys.remove(key);
+                        notifyDataSetChanged();
 
-            delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(value.type==Notification.PIN)
-                        removeRecommend(value.restaurantUUID);
-                    else
-                        removeFriendReq(value.restaurantUUID);
-                }
-            });
+                        if(value.type==Notification.PIN)
+                            removeRecommend(value.uuid);
+                        else
+                            removeFriendReq(value.uuid);
+                    }
+                });
 
-            confirm.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(value.type==Notification.PIN)
-                        addRecommend(value.restaurantUUID);
-                    else
-                        addFriend(value.restaurantUUID);
-                }
-            });
+                confirm.setVisibility(View.VISIBLE);
+                confirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        data.remove(key);
+                        keys.remove(key);
+                        notifyDataSetChanged();
+                        if(value.type==Notification.PIN)
+                            addRecommend(value.uuid);
+                        else
+                            addFriend(value.uuid);
+                    }
+                });
+            }
 
+            else{
+               delete.setVisibility(View.INVISIBLE);
+                confirm.setVisibility(View.INVISIBLE);
+            }
 
             return convertView;
+        }
+
+        public  void setEdit(boolean mode){
+            editMode = mode;
+        }
+
+        public boolean getEdit(){
+            return editMode;
         }
 
     }
@@ -184,7 +197,7 @@ public class NotificationActivity extends Activity {
 
             @Override
             protected Void doInBackground(String... strings) {
-                String uuid = strings[0];
+                usergrid.removeRequestFriend(strings[0]);
                 usergrid.addFriend(strings[0]);
                 return null;
             }
@@ -196,7 +209,6 @@ public class NotificationActivity extends Activity {
 
             @Override
             protected Void doInBackground(String... strings) {
-                String uuid = strings[0];
                 usergrid.removeRequestFriend(strings[0]);
                 return null;
             }
@@ -204,6 +216,7 @@ public class NotificationActivity extends Activity {
     }
 
     private void addRecommend(String restaurant) {
+
         new AsyncTask<String,Void,Void>(){
 
             @Override
@@ -211,9 +224,11 @@ public class NotificationActivity extends Activity {
                 List<String> pin = new ArrayList<String>();
                 pin.add(UserGrid.REC);
                 usergrid.addPin(strings[0],pin);
+                usergrid.removeRecomendation(strings[0]);
                 return null;
             }
         }.execute(restaurant);
+
     }
 
     private void removeRecommend(String restaurant) {
@@ -221,11 +236,11 @@ public class NotificationActivity extends Activity {
 
             @Override
             protected Void doInBackground(String... strings) {
-                String uuid = strings[0];
                 usergrid.removeRecomendation(strings[0]);
                 return null;
             }
         }.execute(restaurant);
+
     }
 
 }

@@ -1,27 +1,18 @@
+//SHOW DIALOG IS REPATISOUS
 package com.restaurantapp.phoneapp.restaurantpinner;
 
-import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import org.json.JSONObject;
-
 import java.util.ArrayList;
-
 
 public class MarkerList extends ListFragment {
 
@@ -40,9 +31,7 @@ public class MarkerList extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        //get info
-        //set tab to map
-        //open dialog
+
         MarkerOptions marker  = (MarkerOptions) l.getAdapter().getItem(position);
         final String uuid = marker.getSnippet();
         final UserGrid usergrid= ((MyApplication)getActivity().getApplicationContext()).usergrid;
@@ -77,7 +66,5 @@ public class MarkerList extends ListFragment {
         });
         dialog.show();
     }
-
-
 
 }

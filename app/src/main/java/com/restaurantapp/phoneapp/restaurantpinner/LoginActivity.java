@@ -7,47 +7,33 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.SeekBar;
 import android.widget.Toast;
 
 
 public class LoginActivity extends Activity {
     UserGrid usergrid;
-    String uuid;
-    String accessToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        usergrid= ((MyApplication)getApplicationContext()).usergrid;
         setContentView(R.layout.activity_login2);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_actions, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        /*int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }*/
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -56,7 +42,6 @@ public class LoginActivity extends Activity {
             case R.id.button_clear:
                 clear();
                 break;
-
             case R.id.button_login:
                 login();
                 break;
@@ -68,11 +53,9 @@ public class LoginActivity extends Activity {
 
     private void clear() {
 
-        //username
         EditText text = (EditText) findViewById(R.id.userId);
         text.setText("");
 
-        //password
         text = (EditText) findViewById(R.id.pwd);
         text.setText("");
     }
@@ -85,14 +68,11 @@ public class LoginActivity extends Activity {
         final String password = text.getText().toString();
 
         if(username.isEmpty() || password.isEmpty()){
-            // print error message
             Toast toast = Toast.makeText(this, "Username or password empty", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
             return;
         }
-
-        final UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
 
         // attempt to login
         new AsyncTask<Void,Void,Boolean>(){
@@ -109,23 +89,12 @@ public class LoginActivity extends Activity {
     }
 
     private void onComplete(Boolean result){
-        Toast toast;
         if(!result){
-            toast = Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
+            showMessage("Invalid Username or Password");
         }else{
-            final UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
-            uuid = usergrid.getUID();
-            accessToken = usergrid.getAccessToken();
-            toast = Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
-            Intent openMainActivity= new Intent(this, MainActivity.class);
-            openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(openMainActivity);
+            showMessage("Login Successful");
+            back();
         }
-        return;
     }
 
     private void newUser(String username, String pass, String email){
@@ -147,31 +116,32 @@ public class LoginActivity extends Activity {
     }
 
     protected void onNewUserComplete(Boolean result){
-        Toast toast;
         if(!result){
-            toast = Toast.makeText(this, "New user creation failed", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
-            return;
+            showMessage( "New user creation failed");
         }else{
-            toast = Toast.makeText(this, "New user created!", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
-            Intent openMainActivity= new Intent(this, MainActivity.class);
-            openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(openMainActivity);
+            showMessage("New User Created");
+            back();
         }
+    }
+
+    private void back(){
+        Intent openMainActivity= new Intent(this, MainActivity.class);
+        openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(openMainActivity);
+    }
+
+    private void showMessage(String message){
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     public class NewUserDialog{
         public NewUserDialog(final Context context){
-            /*final Toast toast = Toast.makeText(context, "Creating new", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();*/
 
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
             LayoutInflater inflater = getLayoutInflater();
-            final View convertView = (View) inflater.inflate(R.layout.dialog_new_user, null);
+            final View convertView = inflater.inflate(R.layout.dialog_new_user, null);
             alertDialog.setView(convertView);
             alertDialog.setTitle("Create New User");
 
@@ -208,7 +178,6 @@ public class LoginActivity extends Activity {
                         return;
                     }
                     newUser(username,password,email);
-                    return;
                 }
             });
 

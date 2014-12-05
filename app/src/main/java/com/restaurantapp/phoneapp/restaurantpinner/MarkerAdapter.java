@@ -1,24 +1,15 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Created by fix on 11/11/2014.
- */
 public class MarkerAdapter extends ArrayAdapter<MarkerOptions> {
 
     public MarkerAdapter(Context context, int layoutResourceId) {
@@ -46,6 +37,5 @@ public class MarkerAdapter extends ArrayAdapter<MarkerOptions> {
 
         return convertView;
     }
-
 }
 

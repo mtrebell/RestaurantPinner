@@ -1,27 +1,20 @@
+//THEME SHOULD BE SET IN STYLES CHECK THEME SETTINGS
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewManager;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by fix on 11/11/2014.
- */
 public class MarkerDialog extends Dialog {
     Bundle info;
     JSONObject restaurant;
@@ -33,22 +26,11 @@ public class MarkerDialog extends Dialog {
         this.parent=parent;
     }
 
-    public MarkerDialog(Context context, int theme) {
-        super(context, theme);
-    }
-
-    protected MarkerDialog(Context context, boolean cancelable, OnCancelListener cancelListener) {
-        super(context, cancelable, cancelListener);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         requestWindowFeature(Window.FEATURE_LEFT_ICON);
         super.onCreate(savedInstanceState);
-
-        View view = getWindow().getDecorView();
-        WindowManager.LayoutParams lp = (WindowManager.LayoutParams) view.getLayoutParams();
 
         setContentView(R.layout.dialog_marker);
 
@@ -83,14 +65,8 @@ public class MarkerDialog extends Dialog {
                 phone.setText(restaurant.getString("phone"));
 
             } catch (JSONException e) {
-                e.printStackTrace();
+                //TOAST COULD NOT LOAD INFO
             }
-
-            //for the button set listener
-            //Open chose pin type dialog
-            //Submit pin or
-            //open chose friend dialog
-            //have a aback button that goes back to map
         }
         this.getWindow().setGravity(Gravity.BOTTOM);
         Button btn = (Button) findViewById(R.id.restraunt_close);
@@ -106,22 +82,18 @@ public class MarkerDialog extends Dialog {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Bundle location = new Bundle();
                 if(restaurant!=null) {
                     Intent addIntent = new Intent(parent,NewPinActivity.class);
                     try {
                         addIntent.putExtra("restaurant", restaurant.getString("uuid"));
                         parent.startActivity(addIntent);
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        //Could not get restraunt data TOAST
                     }
 
                 }
             }
         });
     }
-
-
-
 }
 

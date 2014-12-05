@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -84,12 +85,14 @@ public class SearchActivity extends Activity {
 
     private  void getLoc(){
         final Geocode geocoder = new Geocode(this);
+        final double[] loc = geocoder.getLocation();
+        lat= loc[0];
+        lng=loc[1];
 
         new AsyncTask<Void,Void,String>(){
 
             @Override
             protected String doInBackground(Void... voids) {
-                double[] loc = geocoder.getLocation();
                 return geocoder.reverseGeocode(loc[0],loc[1]);
             }
 
@@ -120,7 +123,7 @@ public class SearchActivity extends Activity {
                 @Override
                 protected  ArrayList<MarkerOptions> doInBackground(Object... objects) {
 
-                    if (location != "" && lat == -1) {
+                    if (!location.isEmpty() && lat == -1) {
                         Geocode geocoder = new Geocode(SearchActivity.this);
                         double[] ltglng = geocoder.geocode(location);
 
@@ -133,8 +136,7 @@ public class SearchActivity extends Activity {
                     double dist = 0;
                     dist = seekBar.getProgress();
 
-                    ArrayList<MarkerOptions> markers = usergrid.restaurantSearch(name, lat, lng, dist, false);
-                    return null;
+                    return usergrid.restaurantSearch(name, lat, lng, dist, false);
                 }
 
                 @Override
@@ -146,8 +148,6 @@ public class SearchActivity extends Activity {
 
     }
 
-
-
     public void loadMarkers(ArrayList<MarkerOptions> markers){
         Intent addIntent = new Intent(this,MainActivity.class);
         addIntent.putParcelableArrayListExtra("Markers",markers);
@@ -155,5 +155,4 @@ public class SearchActivity extends Activity {
         lat = -1;
         lng = -1;
     }
-
 }

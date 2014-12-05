@@ -15,12 +15,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-
 public class MainActivity extends FragmentActivity {
 
-    MyAdapter adapter;
+    TabAdapter adapter;
     ViewPager pager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +26,7 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       // ArrayList<MarkerOptions> data = (ArrayList<MarkerOptions>) extras.get("markerList");
-
-        adapter = new MyAdapter(getSupportFragmentManager());
+        adapter = new TabAdapter(getSupportFragmentManager());
 
         Bundle extras = getIntent().getExtras();
 
@@ -46,7 +42,6 @@ public class MainActivity extends FragmentActivity {
             }
         }
 
-
         pager = (ViewPager)findViewById(R.id.pager);
         pager.setAdapter(adapter);
         pager.setOffscreenPageLimit(2);
@@ -58,7 +53,6 @@ public class MainActivity extends FragmentActivity {
             getActionBar().setSelectedNavigationItem(index);
         }
 
-        //Temp until figure out onClick bug
         Button button = (Button) findViewById(R.id.action_filter);
         button.setOnClickListener(new View.OnClickListener() {
 
@@ -70,14 +64,11 @@ public class MainActivity extends FragmentActivity {
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_actions, menu);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -112,14 +103,6 @@ public class MainActivity extends FragmentActivity {
         outState.putInt("index", i);
     }
 
-        public void onClick(View view){
-            switch ( view.getId()){
-                case R.id.action_filter:
-                    openFilter();
-            }
-
-        }
-
     private void openNewPin() {
         new AlertDialog.Builder(this)
                 .setTitle("Add Pin")
@@ -131,8 +114,7 @@ public class MainActivity extends FragmentActivity {
                             @Override
                             protected double[] doInBackground(Void... voids) {
                                 Geocode geocoder = new Geocode(MainActivity.this);
-                                double[] loc = geocoder.getLocation();
-                                return loc;
+                                return geocoder.getLocation();
                             }
 
                             @Override
@@ -186,10 +168,8 @@ public class MainActivity extends FragmentActivity {
     private void addTabs(){
         final ActionBar actionBar = getActionBar();
 
-        // Specify that tabs should be displayed in the action bar.
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        // Create a tab listener that is called when the user changes tabs.
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
                 pager.setCurrentItem(tab.getPosition());
@@ -204,7 +184,6 @@ public class MainActivity extends FragmentActivity {
             }
         };
 
-        // Add tabs, specifying the tab's text and TabListener
             actionBar.addTab(
                     actionBar.newTab()
                             .setText("Map")

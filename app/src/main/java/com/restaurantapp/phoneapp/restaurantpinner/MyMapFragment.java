@@ -1,8 +1,7 @@
+//SHOW DIALOG
 package com.restaurantapp.phoneapp.restaurantpinner;
 
-
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -10,49 +9,26 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MyMapFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link MyMapFragment#newInstance} factory method to
- * create an instance of this fragment.
- *
- */
 public class MyMapFragment extends Fragment {
-    private LocationClient locationClient;
-    private Location current;
     private GoogleMap map;
-    private LatLngBounds bounds;
-
-    private OnFragmentInteractionListener mListener;
+    private OnFragmentInteractionListener listener;
 
     public static MyMapFragment newInstance(String param1, String param2) {
-        MyMapFragment fragment = new MyMapFragment();
-        return fragment;
+        return new MyMapFragment();
     }
 
     public MyMapFragment() {
@@ -74,7 +50,6 @@ public class MyMapFragment extends Fragment {
             setUpMap();
         }
 
-        //--------------------Build Markers here?----------------------
         if(getArguments()!=null){
             ArrayList<MarkerOptions> markers = getArguments().getParcelableArrayList("Markers");
             if(markers!=null){
@@ -86,27 +61,23 @@ public class MyMapFragment extends Fragment {
         return view;
     }
 
-
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            listener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-
+            listener=null;
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
-
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 
@@ -136,11 +107,9 @@ public class MyMapFragment extends Fragment {
                 .build();
 
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        map.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) new MarkerClick());
+        map.setOnMarkerClickListener(new MarkerClick());
         map.setOnMapLongClickListener(new LongClick());
     }
-
-
 
     public class MarkerClick implements GoogleMap.OnMarkerClickListener{
         @Override
@@ -163,16 +132,6 @@ public class MyMapFragment extends Fragment {
                 }
             }.execute();
 
-
-
-            //Show in dialong
-            //GRAB RESTRAUNT INFO
-           // new thread(){
-                //POPUP DIALOG WITH PINIT BUTTON
-                    //IF CLICKED SMALL DIALOG WITH PINTYPE POPS UP
-                        //IF RECCOMEND CLICKED SHOW A LIST OF FRIENDS
-            //if successful return true
-            //}
             return true;
         }
     }
@@ -188,10 +147,10 @@ public class MyMapFragment extends Fragment {
             startActivity(addIntent);
         }
     }
+
     public void showDialog(Bundle data){
         data.putInt("tab",0);
         MarkerDialog dialog = new MarkerDialog(getActivity(),data,getActivity());
-
         dialog.show();
     }
 
