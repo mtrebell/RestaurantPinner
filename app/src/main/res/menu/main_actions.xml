@@ -34,5 +34,13 @@
         android:title="@string/action_friends"
         android:showAsAction="never" />
 
+    <item android:id="@+id/action_account"
+        android:icon="@drawable/ic_button"
+        android:title="Account Setting"
+        android:showAsAction="never"/>
+
+    <item android:id="@+id/action_logout"
+        android:title="Logout"
+        android:showAsAction="never"/>
 
 </menu>

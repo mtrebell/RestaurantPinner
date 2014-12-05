@@ -15,6 +15,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 
 public class LoginActivity extends Activity {
     UserGrid usergrid;
@@ -68,9 +75,7 @@ public class LoginActivity extends Activity {
         final String password = text.getText().toString();
 
         if(username.isEmpty() || password.isEmpty()){
-            Toast toast = Toast.makeText(this, "Username or password empty", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
+            showMessage("Username or Password Empty");
             return;
         }
 
@@ -92,9 +97,38 @@ public class LoginActivity extends Activity {
         if(!result){
             showMessage("Invalid Username or Password");
         }else{
+
             showMessage("Login Successful");
             back();
+            final UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
+
+            new AsyncTask<Void, Void, HashMap<String, Pin>>(){
+                @Override
+                protected HashMap<String, Pin> doInBackground(Void... voids) {
+                    HashMap<String, Pin> pins = usergrid.getPins();
+                    return pins;
+                }
+
+                @Override
+                protected void onPostExecute(HashMap<String, Pin> result){
+                    onUserPinsComplete(result);
+                }
+            }.execute();
         }
+    }
+
+    private void onUserPinsComplete(HashMap<String, Pin> result){
+        ArrayList<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
+        Iterator it = result.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry data = (Map.Entry)it.next();
+            Pin tempPin = (Pin)data.getValue();
+            markerList.add(tempPin.marker);
+        }
+
+        Intent addUserPinIntent = new Intent(this,MainActivity.class);
+        addUserPinIntent.putParcelableArrayListExtra("Markers",markerList);
+        startActivity(addUserPinIntent);
     }
 
     private void newUser(String username, String pass, String email){
@@ -152,7 +186,6 @@ public class LoginActivity extends Activity {
                     String password;
                     String rePassword;
                     String email;
-                    Toast toast;
 
                     EditText text = (EditText) convertView.findViewById(R.id.editUsername);
                     username = text.getText().toString();
@@ -167,14 +200,10 @@ public class LoginActivity extends Activity {
                     email = text.getText().toString();
 
                     if(username.isEmpty() || password.isEmpty() || rePassword.isEmpty() || email.isEmpty()){
-                        toast = Toast.makeText(context,"One or more fields above is empty", Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
+                        showMessage("One or more of the above fields is empty");
                         return;
                     }else if(!password.equals(rePassword)){
-                        toast = Toast.makeText(context, "Password and re-enter password does not match", Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
+                        showMessage("Passwords don't match");
                         return;
                     }
                     newUser(username,password,email);

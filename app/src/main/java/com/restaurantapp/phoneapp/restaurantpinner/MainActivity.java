@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,6 +68,33 @@ public class MainActivity extends FragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_actions, menu);
+
+        UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
+        MenuItem item;
+        if(usergrid.getUID() == null){
+            item = menu.findItem(R.id.action_account);
+            item.setVisible(false);
+            item = menu.findItem(R.id.action_friends);
+            item.setVisible(false);
+            item = menu.findItem(R.id.action_pins);
+            item.setVisible(false);
+            item = menu.findItem(R.id.action_logout);
+            item.setVisible(false);
+            item = menu.findItem(R.id.action_login);
+            item.setVisible(true);
+        }else
+        {
+            item = menu.findItem(R.id.action_account);
+            item.setVisible(true);
+            item = menu.findItem(R.id.action_friends);
+            item.setVisible(true);
+            item = menu.findItem(R.id.action_pins);
+            item.setVisible(true);
+            item = menu.findItem(R.id.action_logout);
+            item.setVisible(true);
+            item = menu.findItem(R.id.action_login);
+            item.setVisible(false);
+        }
         return true;
     }
 
@@ -90,6 +118,12 @@ public class MainActivity extends FragmentActivity {
                 return true;
             case R.id.action_friends:
                 openFriends();
+                return true;
+            case R.id.action_account:
+                openAccount();
+                return true;
+            case R.id.action_logout:
+                openLogout();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -163,6 +197,44 @@ public class MainActivity extends FragmentActivity {
     private void openFriends(){
         Intent newIntent = new Intent(this,FriendActivity.class);
         startActivity(newIntent);
+    }
+
+    private void openAccount(){
+        Intent newIntent = new Intent(this,AccountActivity.class);
+        startActivity(newIntent);
+    }
+
+    private void openLogout(){
+        final UserGrid usergrid = ((MyApplication)getApplicationContext()).usergrid;
+
+        new AsyncTask<Void,Void,Boolean>(){
+            protected Boolean doInBackground(Void...voids ){
+                return usergrid.logout(usergrid.getUID());
+            }
+
+            protected void onPostExecute(Boolean result){
+                onComplete(result);
+            }
+        }.execute();
+    }
+
+    private void onComplete(Boolean result){
+        Toast toast;
+        if(result)
+        {
+            toast = Toast.makeText(this, "Successfully logged out", Toast.LENGTH_SHORT);
+        }
+        else{
+            toast = Toast.makeText(this, "Logout unsuccessful", Toast.LENGTH_SHORT);
+        }
+
+        toast.setGravity(Gravity.CENTER,0,0);
+        toast.show();
+
+        Intent openMainActivity= new Intent(this, MainActivity.class);
+        // following flag used to prevent users to use back button to navigate to logged in menu
+        openMainActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(openMainActivity);
     }
 
     private void addTabs(){

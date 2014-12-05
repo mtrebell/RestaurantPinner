@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Warning: You are about to DELETE your account. All your saved pins will be lost."
+        android:id="@+id/textView"
+        android:textColor="#ffff251d" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Click OK if you are sure you want to delete your account otherwise click cancel."
+        android:id="@+id/textView2"
+        android:textColor="#ffff251d" />
+</LinearLayout>
