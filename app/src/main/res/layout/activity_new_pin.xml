@@ -8,31 +8,32 @@
             android:id="@+id/addPinLoc"
             android:layout_span="2"
             android:layout_height="wrap_content"
-            android:hint="@string/addPin_hintLoc"
             android:text="Choose Marker"
             android:layout_weight=".66"/>
     </TableRow>
 
-    <TableRow>
+    <TableRow >
         <ToggleButton
             android:id="@+id/rec"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:background="@drawable/ic_button"
+            android:background="@drawable/ic_action_person"
             android:textOn="@string/toggle_turn_on"
             android:textOff="@string/toggle_turn_off"
             android:onClick="onClick"
+            android:textColor="@android:color/holo_blue_dark"
             />
         <ToggleButton
             android:id="@+id/fav"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:background="@drawable/ic_button"
+            android:background="@drawable/ic_action_favorite"
             android:textOn="@string/toggle_turn_on"
             android:textOff="@string/toggle_turn_off"
             android:onClick="onClick"
+            android:textColor="@android:color/holo_blue_dark"
 
             />
         <ToggleButton
@@ -40,10 +41,11 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:background="@drawable/ic_button"
+            android:background="@drawable/ic_action_important"
             android:textOn="@string/toggle_turn_on"
             android:textOff="@string/toggle_turn_off"
             android:onClick="onClick"
+            android:textColor="@android:color/holo_blue_dark"
             />
 
     </TableRow>
@@ -54,20 +56,22 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:background="@drawable/ic_button"
+            android:background="@drawable/ic_action_good"
             android:textOn="@string/toggle_turn_on"
             android:textOff="@string/toggle_turn_off"
             android:onClick="onClick"
+            android:textColor="@android:color/holo_blue_dark"
             />
         <ToggleButton
             android:id="@+id/dis"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:background="@drawable/ic_button"
+            android:background="@drawable/ic_action_bad"
             android:textOn="@string/toggle_turn_on"
             android:textOff="@string/toggle_turn_off"
             android:onClick="onClick"
+            android:textColor="@android:color/holo_blue_dark"
             />
     </TableRow>
     <TableRow>

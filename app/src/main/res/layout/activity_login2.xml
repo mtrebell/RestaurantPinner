@@ -5,8 +5,7 @@
     android:orientation="vertical"
     android:configChanges="orientation"
     tools:context="com.restaurantapp.phoneapp.restaurantpinner.LoginActivity"
-    android:id="@+id/usrlogin"
-    style="@style/Dialog">
+    android:id="@+id/usrlogin">
 
     <EditText
         android:layout_width="wrap_content"
