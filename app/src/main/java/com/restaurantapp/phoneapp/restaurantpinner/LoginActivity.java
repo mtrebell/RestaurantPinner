@@ -17,6 +17,13 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 
 public class LoginActivity extends Activity {
     UserGrid usergrid;
@@ -121,11 +128,41 @@ public class LoginActivity extends Activity {
             toast = Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
-            Intent openMainActivity= new Intent(this, MainActivity.class);
+
+            new AsyncTask<Void, Void, HashMap<String, Pin>>(){
+                @Override
+                protected HashMap<String, Pin> doInBackground(Void... voids) {
+                    HashMap<String, Pin> pins = usergrid.getPins();
+                    return pins;
+                }
+
+                @Override
+                protected void onPostExecute(HashMap<String, Pin> result){
+                    onUserPinsComplete(result);
+                }
+            }.execute();
+
+          /*  Intent openMainActivity= new Intent(this, MainActivity.class);
             openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(openMainActivity);
+            finish();
+            startActivity(openMainActivity);*/
         }
         return;
+    }
+
+    private void onUserPinsComplete(HashMap<String, Pin> result){
+        ArrayList<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
+        Iterator it = result.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry data = (Map.Entry)it.next();
+            Pin tempPin = (Pin)data.getValue();
+            markerList.add(tempPin.marker);
+        }
+
+        Intent addIntent = new Intent(this,MainActivity.class);
+        addIntent.putParcelableArrayListExtra("Markers",markerList);
+        Log.d("SENT MARKER LIST",markerList.toString());
+        startActivity(addIntent);
     }
 
     private void newUser(String username, String pass, String email){

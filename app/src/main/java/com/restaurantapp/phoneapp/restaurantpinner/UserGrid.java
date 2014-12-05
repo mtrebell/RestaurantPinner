@@ -124,6 +124,9 @@ public class UserGrid {
     {
         String query = "/users/"+username+"?access_token="+accessToken;
         System.out.println(request(query, "DELETE"));
+
+        accessToken = "";
+        uId = "";
         return true;
     }
 
