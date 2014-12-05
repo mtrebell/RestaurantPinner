@@ -17,7 +17,7 @@
     <item android:id="@+id/action_notification"
         android:icon="@drawable/ic_action_notification"
         android:title="@string/action_notification"
-        android:showAsAction="always"/>
+        android:showAsAction="never"/>
 
     <item android:id="@+id/action_login"
         android:icon="@drawable/ic_button"
@@ -43,4 +43,8 @@
         android:title="Logout"
         android:showAsAction="never"/>
 
+    <item android:id="@+id/action_changeview"
+        android:icon="@drawable/ic_action_view"
+        android:title="Change View"
+        android:showAsAction="always"/>
 </menu>

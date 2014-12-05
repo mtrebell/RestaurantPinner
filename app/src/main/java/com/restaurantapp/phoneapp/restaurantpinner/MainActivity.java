@@ -16,10 +16,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class MainActivity extends FragmentActivity {
 
     TabAdapter adapter;
     ViewPager pager;
+    Boolean search;
+
+    ArrayList<MarkerOptions> markers;
+    ArrayList<Pin> pins;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,17 +39,23 @@ public class MainActivity extends FragmentActivity {
         adapter = new TabAdapter(getSupportFragmentManager());
 
         Bundle extras = getIntent().getExtras();
+        search = true;
 
         if(extras!=null) {
+            if(extras.containsKey("Search")){
+                search = extras.getBoolean("Search");
+            }
+
             if (extras.containsKey("Markers")) {
-                Toast.makeText(this, "Main got some data!", Toast.LENGTH_SHORT).show();
-                Bundle test = new Bundle();
-                test.putParcelableArrayList("Markers", extras.getParcelableArrayList("Markers"));
-                adapter.setData(test);
+                markers = extras.getParcelableArrayList("Markers");
             }
-            if(extras.get("Markers")!=null){
-                Toast.makeText(this,"Main got a marker array",Toast.LENGTH_SHORT).show();
+            if (extras.containsKey("Pins")) {
+                pins = extras.getParcelableArrayList("Pins");
             }
+
+            displayPins();
+            //Modify Map, and list adapters to check what type and display accordingly
+            //if PIN need to pass only MARKER OPTIONS TO MARKERADAPTER
         }
 
         pager = (ViewPager)findViewById(R.id.pager);
@@ -125,6 +140,10 @@ public class MainActivity extends FragmentActivity {
             case R.id.action_logout:
                 openLogout();
                 return true;
+            case R.id.action_changeview:
+                search = !search;
+                displayPins();
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -135,6 +154,16 @@ public class MainActivity extends FragmentActivity {
         super.onSaveInstanceState(outState);
         int i = getActionBar().getSelectedNavigationIndex();
         outState.putInt("index", i);
+    }
+
+    private void displayPins(){
+        Bundle data = new Bundle();
+        if(search)
+            data.putParcelableArrayList("Markers",markers);
+        else
+            data.putParcelableArrayList("Pins",pins);
+
+       adapter.setData(data);
     }
 
     private void openNewPin() {

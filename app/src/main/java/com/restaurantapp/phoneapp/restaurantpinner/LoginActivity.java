@@ -127,7 +127,8 @@ public class LoginActivity extends Activity {
         }
 
         Intent addUserPinIntent = new Intent(this,MainActivity.class);
-        addUserPinIntent.putParcelableArrayListExtra("Markers",markerList);
+        addUserPinIntent.putExtra("Search",false);
+        addUserPinIntent.putParcelableArrayListExtra("Pins",markerList);
         startActivity(addUserPinIntent);
     }
 

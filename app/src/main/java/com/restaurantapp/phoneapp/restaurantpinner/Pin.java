@@ -1,15 +1,32 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class Pin {
+public class Pin implements Parcelable {
     public double lat,lng;
     public String uuid,name,address;
     public ArrayList<String> types;
     public MarkerOptions marker;
+
+    public Pin(Parcel p){
+        lat = p.readDouble();
+        lng = p.readDouble();
+
+        types  = new ArrayList<String>();
+        p.readList(types,String.class.getClassLoader());
+
+        uuid = p.readString();
+        name = p.readString();
+        address = p.readString();
+
+        marker = p.readParcelable(MarkerOptions.class.getClassLoader());
+    }
 
     public Pin(String uuid,String name,String address,String type,double lat,double lng){
         this.uuid=uuid;
@@ -25,5 +42,21 @@ public class Pin {
                 .position(latlng)
                 .title(name)
                 .snippet(uuid);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeDouble(lat);
+        parcel.writeDouble(lng);
+        parcel.writeList(types);
+        parcel.writeString(uuid);
+        parcel.writeString(name);
+        parcel.writeString(address);
+        parcel.writeParcelable(marker,i);
     }
 }

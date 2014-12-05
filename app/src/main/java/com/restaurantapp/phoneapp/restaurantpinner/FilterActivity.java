@@ -132,6 +132,7 @@ public class FilterActivity extends Activity {
 
         Intent addUserPinIntent = new Intent(this,MainActivity.class);
         addUserPinIntent.putParcelableArrayListExtra("Markers",filteredList);
+        addUserPinIntent.putExtra("Search",false);
         startActivity(addUserPinIntent);
     }
 }

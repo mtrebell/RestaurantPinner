@@ -56,6 +56,11 @@ public class MyMapFragment extends Fragment {
                 for(MarkerOptions marker :markers)
                     map.addMarker(marker);
             }
+            else{
+                ArrayList<Pin> pins = getArguments().getParcelableArrayList("Pins");
+                for(Pin pin :pins)
+                    map.addMarker(pin.marker);
+            }
         }
 
         return view;
@@ -114,6 +119,7 @@ public class MyMapFragment extends Fragment {
     public class MarkerClick implements GoogleMap.OnMarkerClickListener{
         @Override
         public boolean onMarkerClick(Marker marker) {
+
             final String uuid = marker.getSnippet();
             final UserGrid usergrid= ((MyApplication)getActivity().getApplicationContext()).usergrid;
 
@@ -121,9 +127,9 @@ public class MyMapFragment extends Fragment {
                 @Override
                 protected Bundle doInBackground(Void...voids) {
 
-                    JSONObject restraunt = usergrid.restaurantInfo(uuid);
+                    JSONObject restaurant = usergrid.restaurantInfo(uuid);
                     Bundle bundle = new Bundle();
-                    bundle.putString("data",restraunt.toString());
+                    bundle.putString("data",restaurant.toString());
                     return bundle;
                 }
 

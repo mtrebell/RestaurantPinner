@@ -9,19 +9,31 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MarkerList extends ListFragment {
+    boolean search;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        MarkerAdapter adapter = new MarkerAdapter(inflater.getContext(), android.R.layout.simple_list_item_1);
+        ArrayAdapter adapter = new MarkerAdapter(inflater.getContext(), android.R.layout.simple_list_item_1);
         if(getArguments()!=null){
             ArrayList<MarkerOptions> markers = getArguments().getParcelableArrayList("Markers");
-            adapter.addAll(markers);
+            if(markers!=null) {
+                adapter.addAll(markers);
+                search = true;
+            }
+            else {
+                ArrayList<Pin> pin = getArguments().getParcelableArrayList("Pin");
+                if(pin!=null) {
+                    adapter.addAll(pin);
+                    search=false;
+                }
+            }
         }
         setListAdapter(adapter);
        adapter.notifyDataSetChanged();
@@ -31,16 +43,25 @@ public class MarkerList extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        String uuid;
 
-        MarkerOptions marker  = (MarkerOptions) l.getAdapter().getItem(position);
-        final String uuid = marker.getSnippet();
+        if(search) {
+            MarkerOptions marker = (MarkerOptions) l.getAdapter().getItem(position);
+             uuid = marker.getSnippet();
+        }
+
+        else{
+            Pin pin =(Pin) l.getAdapter().getItem(position);
+            uuid = pin.uuid;
+        }
+
         final UserGrid usergrid= ((MyApplication)getActivity().getApplicationContext()).usergrid;
 
-        new AsyncTask<Void,Void,Bundle>() {
+        new AsyncTask<String,Void,Bundle>() {
             @Override
-            protected Bundle doInBackground(Void...voids) {
+            protected Bundle doInBackground(String...strings) {
 
-                JSONObject restraunt = usergrid.restaurantInfo(uuid);
+                JSONObject restraunt = usergrid.restaurantInfo(strings[0]);
                 Log.d("Restraunt", restraunt.toString());
                 Bundle bundle = new Bundle();
                 bundle.putString("data",restraunt.toString());
@@ -50,8 +71,7 @@ public class MarkerList extends ListFragment {
             protected void onPostExecute(Bundle result) {
                 showDialog(result);
             }
-        }.execute();
-
+        }.execute(uuid);
     }
 
     public void showDialog(Bundle data){
