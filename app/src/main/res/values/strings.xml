@@ -44,5 +44,11 @@
     <string name="button_change_pass">Change Password</string>
     <string name="delete_account">Delete Account:</string>
     <string name="button_delete_account">Delete Account</string>
+    <string name="pin_types">Pin Types:</string>
+    <string name="checkbox_favourite">Favourite</string>
+    <string name="checkbox_recommended">Friend Recommended</string>
+    <string name="checkbox_wishlist">Wishlist</string>
+    <string name="checkbox_liked">Like</string>
+    <string name="checkbox_disliked">Disliked</string>
 
 </resources>
