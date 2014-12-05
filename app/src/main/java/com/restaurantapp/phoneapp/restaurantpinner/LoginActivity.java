@@ -159,10 +159,10 @@ public class LoginActivity extends Activity {
             markerList.add(tempPin.marker);
         }
 
-        Intent addIntent = new Intent(this,MainActivity.class);
-        addIntent.putParcelableArrayListExtra("Markers",markerList);
+        Intent addUserPinIntent = new Intent(this,MainActivity.class);
+        addUserPinIntent.putParcelableArrayListExtra("Markers",markerList);
         Log.d("SENT MARKER LIST",markerList.toString());
-        startActivity(addIntent);
+        startActivity(addUserPinIntent);
     }
 
     private void newUser(String username, String pass, String email){
