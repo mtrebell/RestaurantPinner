@@ -59,4 +59,14 @@ public class Pin implements Parcelable {
         parcel.writeString(address);
         parcel.writeParcelable(marker,i);
     }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Pin createFromParcel(Parcel in) {
+            return new Pin(in);
+        }
+
+        public Pin[] newArray(int size) {
+            return new Pin[size];
+        }
+    };
 }

@@ -118,12 +118,12 @@ public class LoginActivity extends Activity {
     }
 
     private void onUserPinsComplete(HashMap<String, Pin> result){
-        ArrayList<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
+        ArrayList<Pin> markerList = new ArrayList<Pin>();
         Iterator it = result.entrySet().iterator();
         while(it.hasNext()){
             Map.Entry data = (Map.Entry)it.next();
             Pin tempPin = (Pin)data.getValue();
-            markerList.add(tempPin.marker);
+            markerList.add(tempPin);
         }
 
         Intent addUserPinIntent = new Intent(this,MainActivity.class);
