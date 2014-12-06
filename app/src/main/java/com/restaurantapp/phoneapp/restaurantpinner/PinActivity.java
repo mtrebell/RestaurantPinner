@@ -70,8 +70,13 @@ public class PinActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_edit) {
+
+        switch(id){
+        case R.id.action_edit:
             changeButtons();
+              break;
+            case R.id.action_home:
+                finish();
         }
         return super.onOptionsItemSelected(item);
     }

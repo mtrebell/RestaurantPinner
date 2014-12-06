@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -156,6 +155,21 @@ public class MainActivity extends FragmentActivity {
         outState.putInt("index", i);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode==1)
+        {
+            Bundle extras = data.getExtras();
+             search=extras.getBoolean("Search");
+             markers=extras.getParcelableArrayList("Markers");
+             displayPins();
+        }
+
+    }
+
     private void displayPins(){
         Bundle data = new Bundle();
         if(search)
@@ -194,7 +208,7 @@ public class MainActivity extends FragmentActivity {
 
     private void openSearch() {
         Intent searchIntent = new Intent(this,SearchActivity.class);
-        startActivity(searchIntent);
+        startActivityForResult(searchIntent,1);
     }
 
     private void openFilter( ) {

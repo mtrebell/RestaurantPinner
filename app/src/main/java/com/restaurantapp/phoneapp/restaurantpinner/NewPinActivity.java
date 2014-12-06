@@ -226,13 +226,8 @@ public class NewPinActivity extends Activity {
         uuid =null;
         lat=-1;
         lng=-1;
-        Intent openMainActivity= new Intent(this, MainActivity.class);
-        openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivity(openMainActivity);
+        finish();
     }
-    //Start the confirm dialog
-            //pass restraunts and get ref to map
-
 
     public class ConfirmDialog{
         MarkerAdapter adapter;

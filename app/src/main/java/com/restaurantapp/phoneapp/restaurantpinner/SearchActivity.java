@@ -148,11 +148,12 @@ public class SearchActivity extends Activity {
     }
 
     public void loadMarkers(ArrayList<MarkerOptions> markers){
-        Intent addIntent = new Intent(this,MainActivity.class);
+        Intent addIntent = new Intent();
         addIntent.putExtra("Search",true);
         addIntent.putParcelableArrayListExtra("Markers",markers);
-        startActivity(addIntent);
+        setResult(1,addIntent);
         lat = -1;
         lng = -1;
+        finish();
     }
 }

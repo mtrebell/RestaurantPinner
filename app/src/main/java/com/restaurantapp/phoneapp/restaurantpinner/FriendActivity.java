@@ -63,7 +63,6 @@ public class FriendActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_friend, menu);
         return true;
     }
@@ -76,8 +75,7 @@ public class FriendActivity extends Activity {
                     searchDialog();
                     return true;
                 case R.id.action_home:
-                    //return home
-                    return true;
+                    finish();
                 default:
                     return false;
             }
