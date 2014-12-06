@@ -187,12 +187,14 @@ public class MainActivity extends FragmentActivity {
         if(data == null)
             return;
         Bundle extras = data.getExtras();
+        System.out.println("requestCode: " + requestCode);
         switch(requestCode){
             case 1:
                 search=true;
                 markers=extras.getParcelableArrayList("Markers");
-                if(!displayDislike)
-                    filterDislike();
+                if(dislikeIds != null)
+                    if(!displayDislike)
+                        filterDislike();
                 displayPins();
                 break;
             case 2:
@@ -230,11 +232,15 @@ public class MainActivity extends FragmentActivity {
             case 5:
                 Pin tempPin = extras.getParcelable("NewPin");
                 System.out.println("New Pin");
-                fullPins.add(tempPin);
-                if(tempPin.types.contains("dislike")){
-                    dislikeIds.add(tempPin.uuid);
-                }else
-                    pins.add(tempPin);
+                if(fullPins!=null && dislikeIds !=null && pins != null) {
+                    fullPins.add(tempPin);
+
+                    if (tempPin.types.contains("dislike")) {
+                        dislikeIds.add(tempPin.uuid);
+                    } else
+                        pins.add(tempPin);
+                }
+                break;
         }
     }
 
@@ -307,7 +313,7 @@ public class MainActivity extends FragmentActivity {
             Intent newIntent = new Intent(this, NewPinActivity.class);
             newIntent.putExtra("lat", loc[0]);
             newIntent.putExtra("lng", loc[1]);
-            startActivityForResult(newIntent,5);
+            startActivityForResult(newIntent, 5);
         }
     }
 

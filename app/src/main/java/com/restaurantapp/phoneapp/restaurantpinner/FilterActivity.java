@@ -146,6 +146,7 @@ public class FilterActivity extends Activity {
     private ArrayList<Pin> filterPins(ArrayList<String>selectedPinTypes){
         ArrayList<Pin>filteredList = new ArrayList<Pin>();
 
+        if(pins != null)
         for (Pin tempPin : pins){
             Boolean selected = false;
 
