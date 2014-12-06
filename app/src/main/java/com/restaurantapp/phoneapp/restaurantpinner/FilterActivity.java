@@ -111,6 +111,11 @@ public class FilterActivity extends Activity {
             selectedPinTypes.add("reccomend");
         }
 
+        filterOptions = (CheckBox)findViewById(R.id.chkDislike);
+        if(filterOptions.isChecked()){
+            selectedPinTypes.add("dislike");
+        }
+
         ArrayList<Pin>results;
         if(search)
             results = filterMarkers(selectedPinTypes);
