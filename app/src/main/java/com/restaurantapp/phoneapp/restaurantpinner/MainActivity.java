@@ -30,6 +30,7 @@ public class MainActivity extends FragmentActivity {
     ArrayList<MarkerOptions> markers;
     ArrayList<Pin> pins;
     ArrayList<Pin> filtered;
+    ArrayList<Pin> fullPins;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,7 @@ public class MainActivity extends FragmentActivity {
             getActionBar().setSelectedNavigationItem(index);
             pins = savedInstanceState.getParcelableArrayList("Pins");
             search = savedInstanceState.getBoolean("Search");
+            fullPins = savedInstanceState.getParcelableArrayList("FullPins");
         }
 
         Bundle extras = getIntent().getExtras();
@@ -69,6 +71,9 @@ public class MainActivity extends FragmentActivity {
             }
             if (extras.containsKey("Filtered")){
                 filtered = extras.getParcelableArrayList("Filtered");
+            }
+            if (extras.containsKey("FullPins")) {
+                fullPins = extras.getParcelableArrayList("FullPins");
             }
         }
         if(pins != null || markers != null || filtered != null)
@@ -166,6 +171,7 @@ public class MainActivity extends FragmentActivity {
         int i = getActionBar().getSelectedNavigationIndex();
         outState.putInt("index", i);
         outState.putParcelableArrayList("Pins",pins);
+        outState.putParcelableArrayList("FullPins",fullPins);
         outState.putBoolean("Search", search);
     }
 
@@ -188,6 +194,7 @@ public class MainActivity extends FragmentActivity {
                 break;
             case 3:
                 pins = extras.getParcelableArrayList("Pins");
+                fullPins = extras.getParcelableArrayList("FullPins");
                 System.out.println(pins.toString());
                 search = false;
                 displayPins();
@@ -246,7 +253,7 @@ public class MainActivity extends FragmentActivity {
         if(search)
             filterIntent.putParcelableArrayListExtra("Markers", markers);
 
-            filterIntent.putParcelableArrayListExtra("Pins", pins);
+            filterIntent.putParcelableArrayListExtra("Pins", fullPins);
 
         startActivityForResult(filterIntent, 2);
     }
