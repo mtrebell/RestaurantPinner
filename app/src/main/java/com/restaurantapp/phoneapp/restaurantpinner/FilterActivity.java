@@ -19,11 +19,26 @@ import java.util.Map;
 
 public class FilterActivity extends Activity {
     UserGrid usergrid;
+    Boolean search;
+    ArrayList<MarkerOptions> markers;
+    ArrayList<Pin> pins;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            if (extras.containsKey("Markers")) {
+                markers = extras.getParcelableArrayList("Markers");
+                search = true;
+            }
+            if (extras.containsKey("Pins")) {
+                pins = extras.getParcelableArrayList("Pins");
+                search = false;
+            }
+        }
     }
 
     @Override
@@ -96,43 +111,52 @@ public class FilterActivity extends Activity {
             selectedPinTypes.add("reccomend");
         }
 
-        new AsyncTask<Void, Void, HashMap<String, Pin> >(){
-            @Override
-            protected HashMap<String, Pin> doInBackground(Void... voids){
-                UserGrid userGrid = ((MyApplication)getApplicationContext()).usergrid;
-                return userGrid.getPins();
-            }
+        ArrayList<Pin>results;
+        if(search)
+            results = filterMarkers(selectedPinTypes);
+        else
+            results =  filterPins(selectedPinTypes);
 
-            @Override
-            protected void onPostExecute(HashMap<String, Pin> pins) {
-                onPinRetrieveComplete(pins, selectedPinTypes);
-            }
-        }.execute();
+        Intent addUserPinIntent = new Intent();
+        addUserPinIntent.putParcelableArrayListExtra("Filtered",results);
+        addUserPinIntent.putExtra("Search",false);
+        setResult(2,addUserPinIntent);
+        //startActivity(addUserPinIntent);
+        finish();
     }
 
-    private void onPinRetrieveComplete(HashMap<String, Pin>pins, ArrayList<String>selectedPinTypes){
-        ArrayList<MarkerOptions>filteredList = new ArrayList<MarkerOptions>();
-        Iterator it = pins.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry data = (Map.Entry)it.next();
-            Pin tempPin = (Pin)data.getValue();
+    private ArrayList<Pin> filterPins(ArrayList<String>selectedPinTypes){
+        ArrayList<Pin>filteredList = new ArrayList<Pin>();
 
-            Iterator pinIt = tempPin.types.iterator();
+        for (Pin tempPin : pins){
             Boolean selected = false;
-            while(pinIt.hasNext()){
-                if(selectedPinTypes.contains(pinIt.next().toString()) ){
+
+            for(String type : selectedPinTypes){
+                if(tempPin.types.contains(type)){
                     selected = true;
                     break;
                 }
             }
             if(selected){
-                filteredList.add(tempPin.marker);
+                filteredList.add(tempPin);
             }
         }
 
-        Intent addUserPinIntent = new Intent(this,MainActivity.class);
-        addUserPinIntent.putParcelableArrayListExtra("Markers",filteredList);
-        addUserPinIntent.putExtra("Search",false);
-        startActivity(addUserPinIntent);
+        return filteredList;
+    }
+
+    private ArrayList<Pin> filterMarkers(ArrayList<String>selectedPinTypes){
+        ArrayList<Pin>filteredList = filterPins(selectedPinTypes);
+        ArrayList<Pin>filteredPins = new ArrayList<Pin>();
+
+        for (Pin tempPin : filteredList){
+            for(MarkerOptions marker : markers){
+                if(tempPin.uuid.equals(marker.getSnippet())){
+                    filteredPins.add(tempPin);
+                }
+            }
+        }
+
+        return filteredPins;
     }
 }

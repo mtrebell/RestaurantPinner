@@ -29,6 +29,7 @@ public class MainActivity extends FragmentActivity {
 
     ArrayList<MarkerOptions> markers;
     ArrayList<Pin> pins;
+    ArrayList<Pin> filtered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,20 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         adapter = new TabAdapter(getSupportFragmentManager());
+
+        pager = (ViewPager)findViewById(R.id.pager);
+        pager.setAdapter(adapter);
+        pager.setOffscreenPageLimit(2);
+
+        addTabs();
+        System.out.println("onCreate");
+        if(savedInstanceState != null) {
+            int index = savedInstanceState.getInt("index");
+            getActionBar().setSelectedNavigationItem(index);
+            getActionBar().setSelectedNavigationItem(index);
+            pins = savedInstanceState.getParcelableArrayList("Pins");
+            search = savedInstanceState.getBoolean("Search");
+        }
 
         Bundle extras = getIntent().getExtras();
         search = true;
@@ -52,22 +67,19 @@ public class MainActivity extends FragmentActivity {
             if (extras.containsKey("Pins")) {
                 pins = extras.getParcelableArrayList("Pins");
             }
+            if (extras.containsKey("Filtered")){
+                filtered = extras.getParcelableArrayList("Filtered");
+            }
 
-            displayPins();
             //Modify Map, and list adapters to check what type and display accordingly
             //if PIN need to pass only MARKER OPTIONS TO MARKERADAPTER
         }
+        if(pins != null || markers != null || filtered != null)
+            displayPins();
 
-        pager = (ViewPager)findViewById(R.id.pager);
-        pager.setAdapter(adapter);
-        pager.setOffscreenPageLimit(2);
 
-        addTabs();
 
-        if(savedInstanceState != null) {
-            int index = savedInstanceState.getInt("index");
-            getActionBar().setSelectedNavigationItem(index);
-        }
+
 
         Button button = (Button) findViewById(R.id.action_filter);
         button.setOnClickListener(new View.OnClickListener() {
@@ -155,11 +167,26 @@ public class MainActivity extends FragmentActivity {
         super.onSaveInstanceState(outState);
         int i = getActionBar().getSelectedNavigationIndex();
         outState.putInt("index", i);
+        outState.putParcelableArrayList("Pins",pins);
+        outState.putBoolean("Search", search);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode,data);
+
+        if(requestCode==2){
+            Bundle extras = data.getExtras();
+            filtered = extras.getParcelableArrayList("Filtered");
+            displayPins();
+        }
     }
 
     private void displayPins(){
         Bundle data = new Bundle();
-        if(search)
+        if(filtered != null)
+            data.putParcelableArrayList("Pins",filtered);
+        else if(search)
             data.putParcelableArrayList("Markers",markers);
         else
             data.putParcelableArrayList("Pins",pins);
@@ -199,7 +226,13 @@ public class MainActivity extends FragmentActivity {
 
     private void openFilter( ) {
         Intent filterIntent = new Intent(this,FilterActivity.class);
-        startActivity(filterIntent);
+
+        if(search)
+            filterIntent.putParcelableArrayListExtra("Markers", markers);
+
+            filterIntent.putParcelableArrayListExtra("Pins", pins);
+
+        startActivityForResult(filterIntent, 2);
     }
 
     private void openLogin() {
