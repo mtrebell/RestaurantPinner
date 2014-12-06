@@ -25,6 +25,7 @@ public class MainActivity extends FragmentActivity {
 
     TabAdapter adapter;
     ViewPager pager;
+    private Menu menu;
     Boolean search;
 
     ArrayList<MarkerOptions> markers;
@@ -84,38 +85,28 @@ public class MainActivity extends FragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_actions, menu);
-
+        this.menu = menu;
         UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
-        MenuItem item;
-        if(usergrid.getUID() == null){
-            item = menu.findItem(R.id.action_account);
-            item.setVisible(false);
-            item = menu.findItem(R.id.action_friends);
-            item.setVisible(false);
-            item = menu.findItem(R.id.action_pins);
-            item.setVisible(false);
-            item = menu.findItem(R.id.action_logout);
-            item.setVisible(false);
-            item = menu.findItem(R.id.action_login);
-            item.setVisible(true);
-            item = menu.findItem(R.id.action_notification);
-            item.setVisible(false);
-        }else
-        {
-            item = menu.findItem(R.id.action_account);
-            item.setVisible(true);
-            item = menu.findItem(R.id.action_friends);
-            item.setVisible(true);
-            item = menu.findItem(R.id.action_pins);
-            item.setVisible(true);
-            item = menu.findItem(R.id.action_logout);
-            item.setVisible(true);
-            item = menu.findItem(R.id.action_login);
-            item.setVisible(false);
-            item = menu.findItem(R.id.action_notification);
-            item.setVisible(false);
-        }
+        setVisability(usergrid.getUID() != null); //if logged in
         return true;
+    }
+
+    public void setVisability(boolean visability){
+        MenuItem item;
+        //Login is opposite
+        item = menu.findItem(R.id.action_login);
+        item.setVisible(!visability);
+
+        item = menu.findItem(R.id.action_account);
+        item.setVisible(visability);
+        item = menu.findItem(R.id.action_friends);
+        item.setVisible(visability);
+        item = menu.findItem(R.id.action_pins);
+        item.setVisible(visability);
+        item = menu.findItem(R.id.action_logout);
+        item.setVisible(visability);
+        item = menu.findItem(R.id.action_notification);
+        item.setVisible(visability);
     }
 
     @Override
@@ -202,8 +193,10 @@ public class MainActivity extends FragmentActivity {
             data.putParcelableArrayList("Pins", filtered);
         }else if(search) {
             data.putParcelableArrayList("Markers", markers);
-        }else
+        }else {
             data.putParcelableArrayList("Pins", pins);
+            setVisability(true);
+        }
 
        adapter.setData(data);
        pager.getAdapter().notifyDataSetChanged();
