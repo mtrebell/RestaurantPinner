@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 
 class TabAdapter extends FragmentPagerAdapter {
     Bundle bundle;
@@ -33,6 +34,15 @@ class TabAdapter extends FragmentPagerAdapter {
         }
 
         return fragment;
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        UpdatableFragment f = (UpdatableFragment ) object;
+        if (f != null) {
+            f.update(bundle);
+        }
+        return super.getItemPosition(object);
     }
 
     @Override

@@ -104,9 +104,6 @@ public class MapActivity extends Activity {
     public void onClick(View view){
         int id = view.getId();
         if(id==R.id.back){
-            Intent back= new Intent(this, PinActivity.class);
-            back.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(back);
             finish();
         }
     }

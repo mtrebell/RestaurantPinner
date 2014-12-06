@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+
 
 public class MainActivity extends FragmentActivity {
 
@@ -56,6 +56,12 @@ public class MainActivity extends FragmentActivity {
         Bundle extras = getIntent().getExtras();
         search = true;
 
+        pager = (ViewPager)findViewById(R.id.pager);
+        pager.setAdapter(adapter);
+        pager.setOffscreenPageLimit(2);
+
+        addTabs();
+
         if(extras!=null) {
             if(extras.containsKey("Search")){
                 search = extras.getBoolean("Search");
@@ -73,12 +79,10 @@ public class MainActivity extends FragmentActivity {
 
             //Modify Map, and list adapters to check what type and display accordingly
             //if PIN need to pass only MARKER OPTIONS TO MARKERADAPTER
+
         }
         if(pins != null || markers != null || filtered != null)
             displayPins();
-
-
-
 
 
         Button button = (Button) findViewById(R.id.action_filter);
@@ -89,7 +93,6 @@ public class MainActivity extends FragmentActivity {
 
             }
         });
-
     }
 
     @Override
@@ -153,14 +156,15 @@ public class MainActivity extends FragmentActivity {
                 openLogout();
                 return true;
             case R.id.action_changeview:
-                search = !search;
                 displayPins();
+                search = !search;
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -180,6 +184,14 @@ public class MainActivity extends FragmentActivity {
             filtered = extras.getParcelableArrayList("Filtered");
             displayPins();
         }
+
+        if(requestCode==1)
+        {
+            Bundle extras = data.getExtras();
+            search=extras.getBoolean("Search");
+            markers=extras.getParcelableArrayList("Markers");
+            displayPins();
+        }
     }
 
     private void displayPins(){
@@ -189,9 +201,10 @@ public class MainActivity extends FragmentActivity {
         else if(search)
             data.putParcelableArrayList("Markers",markers);
         else
-            data.putParcelableArrayList("Pins",pins);
+            data.putParcelableArrayList("Pins", pins);
 
        adapter.setData(data);
+       pager.getAdapter().notifyDataSetChanged();
     }
 
     private void openNewPin() {
@@ -221,7 +234,7 @@ public class MainActivity extends FragmentActivity {
 
     private void openSearch() {
         Intent searchIntent = new Intent(this,SearchActivity.class);
-        startActivity(searchIntent);
+        startActivityForResult(searchIntent,1);
     }
 
     private void openFilter( ) {
@@ -329,7 +342,6 @@ public class MainActivity extends FragmentActivity {
                         .setText("List")
                         .setTabListener(tabListener));
         }
-
     }
 
 

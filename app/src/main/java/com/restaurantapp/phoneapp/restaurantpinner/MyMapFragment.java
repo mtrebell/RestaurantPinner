@@ -22,8 +22,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MyMapFragment extends Fragment {
+public class MyMapFragment extends Fragment implements UpdatableFragment {
     private GoogleMap map;
     private OnFragmentInteractionListener listener;
 
@@ -80,6 +81,32 @@ public class MyMapFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         listener = null;
+    }
+
+
+    @Override
+    public void update(Bundle data) {
+        if(map==null) {
+            map = ((SupportMapFragment) getFragmentManager()
+                    .findFragmentById(R.id.map)).getMap();
+            setUpMap();
+        }
+
+        map.clear();
+        if(data.containsKey("Markers")) {
+            List<MarkerOptions> markers = data.getParcelableArrayList("Markers");
+            if(markers!=null)
+                for (MarkerOptions marker : markers) {
+                    map.addMarker(marker);
+                }
+        }
+        else if(data.containsKey("Pins")){
+            List<Pin> pins = data.getParcelableArrayList("Pins");
+            if(pins!=null)
+                for(Pin pin: pins){
+                    map.addMarker(pin.marker);
+                }
+        }
     }
 
     public interface OnFragmentInteractionListener {
