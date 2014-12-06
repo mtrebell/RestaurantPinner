@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +20,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+
 
 public class MainActivity extends FragmentActivity {
 
@@ -41,6 +42,12 @@ public class MainActivity extends FragmentActivity {
         Bundle extras = getIntent().getExtras();
         search = true;
 
+        pager = (ViewPager)findViewById(R.id.pager);
+        pager.setAdapter(adapter);
+        pager.setOffscreenPageLimit(2);
+
+        addTabs();
+
         if(extras!=null) {
             if(extras.containsKey("Search")){
                 search = extras.getBoolean("Search");
@@ -54,15 +61,7 @@ public class MainActivity extends FragmentActivity {
             }
 
             displayPins();
-            //Modify Map, and list adapters to check what type and display accordingly
-            //if PIN need to pass only MARKER OPTIONS TO MARKERADAPTER
         }
-
-        pager = (ViewPager)findViewById(R.id.pager);
-        pager.setAdapter(adapter);
-        pager.setOffscreenPageLimit(2);
-
-        addTabs();
 
         if(savedInstanceState != null) {
             int index = savedInstanceState.getInt("index");
@@ -77,7 +76,6 @@ public class MainActivity extends FragmentActivity {
 
             }
         });
-
     }
 
     @Override
@@ -141,14 +139,15 @@ public class MainActivity extends FragmentActivity {
                 openLogout();
                 return true;
             case R.id.action_changeview:
-                search = !search;
                 displayPins();
+                search = !search;
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -162,9 +161,10 @@ public class MainActivity extends FragmentActivity {
         if(search)
             data.putParcelableArrayList("Markers",markers);
         else
-            data.putParcelableArrayList("Pins",pins);
+            data.putParcelableArrayList("Pins", pins);
 
        adapter.setData(data);
+       pager.getAdapter().notifyDataSetChanged();
     }
 
     private void openNewPin() {
@@ -296,7 +296,6 @@ public class MainActivity extends FragmentActivity {
                         .setText("List")
                         .setTabListener(tabListener));
         }
-
     }
 
 

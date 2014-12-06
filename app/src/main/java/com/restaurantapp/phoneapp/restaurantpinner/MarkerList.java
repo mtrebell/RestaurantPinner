@@ -14,29 +14,36 @@ import android.widget.ListView;
 import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MarkerList extends ListFragment {
+public class MarkerList extends ListFragment implements UpdatableFragment {
     boolean search;
+    ArrayAdapter markerAdapter;
+    ArrayAdapter pinAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        ArrayAdapter adapter = new MarkerAdapter(inflater.getContext(), android.R.layout.simple_list_item_1);
+        markerAdapter = new MarkerAdapter(inflater.getContext(), android.R.layout.simple_list_item_1);
+        pinAdapter = new PinAdapter(inflater.getContext(), android.R.layout.simple_list_item_1);
+
         if(getArguments()!=null){
             ArrayList<MarkerOptions> markers = getArguments().getParcelableArrayList("Markers");
             if(markers!=null) {
-                adapter.addAll(markers);
+                markerAdapter.addAll(markers);
                 search = true;
+                setListAdapter(markerAdapter);
+                markerAdapter.notifyDataSetChanged();
             }
             else {
-                ArrayList<Pin> pin = getArguments().getParcelableArrayList("Pin");
+                ArrayList<Pin> pin = getArguments().getParcelableArrayList("Pins");
                 if(pin!=null) {
-                    adapter.addAll(pin);
+                    pinAdapter.addAll(pin);
                     search=false;
                 }
+                setListAdapter(pinAdapter);
+                pinAdapter.notifyDataSetChanged();
             }
         }
-        setListAdapter(adapter);
-       adapter.notifyDataSetChanged();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -87,4 +94,27 @@ public class MarkerList extends ListFragment {
         dialog.show();
     }
 
+    @Override
+    public void update(Bundle bundle) {
+        markerAdapter.clear();
+        pinAdapter.clear();
+
+        if(bundle.containsKey("Markers")) {
+            List<MarkerOptions> marker = bundle.getParcelableArrayList("Markers");
+            if(marker!=null)
+                markerAdapter.addAll(marker);
+            setListAdapter(markerAdapter);
+            markerAdapter.notifyDataSetChanged();
+            search =true;
+        }
+
+        else if(bundle.containsKey("Pins")) {
+            List<Pin> pins = bundle.getParcelableArrayList("Pins");
+            if(pins!=null)
+                pinAdapter.addAll(pins);
+            setListAdapter(pinAdapter);
+            pinAdapter.notifyDataSetChanged();
+            search=false;
+        }
+    }
 }
