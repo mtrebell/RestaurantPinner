@@ -121,7 +121,6 @@ public class FilterActivity extends Activity {
         addUserPinIntent.putParcelableArrayListExtra("Filtered",results);
         addUserPinIntent.putExtra("Search",false);
         setResult(2,addUserPinIntent);
-        //startActivity(addUserPinIntent);
         finish();
     }
 

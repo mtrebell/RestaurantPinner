@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,90 +6,158 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.restaurantapp.phoneapp.restaurantpinner.FilterActivity">
-
+    tools:context="com.restaurantapp.phoneapp.restaurantpinner.FilterActivity"
+    android:orientation="vertical">
+<TableLayout
+    android:layout_height="0dp"
+    android:layout_width="match_parent"
+    android:layout_weight="0.5">
+    <TableRow android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <TextView
         android:text="@string/pin_types"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/txtPinType" />
+        android:id="@+id/txtPinType"
+        android:textSize="15sp"/>
+    </TableRow>
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/checkbox_favourite"
-        android:id="@+id/chkFavourite"
-        android:layout_below="@+id/txtPinType"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="42dp"
-        android:checked="false" />
+    <TableRow android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/filter_row_0"
+        android:orientation="vertical">
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/checkbox_liked"
-        android:id="@+id/chkLiked"
-        android:layout_toRightOf="@+id/chkFavourite"
-        android:checked="false"
-        android:layout_alignTop="@+id/chkFavourite"
-        android:layout_centerHorizontal="true" />
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/checkbox_wishlist"
-        android:id="@+id/chkWishlist"
-        android:layout_toEndOf="@+id/chkRecommended"
-        android:layout_toRightOf="@+id/chkRecommended"
-        android:checked="false"
-        android:layout_below="@+id/chkRecommended"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/fav_icon"
+            android:src="@drawable/ic_action_favorite"
+            android:layout_gravity="center_horizontal"/>
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/checkbox_recommended"
-        android:id="@+id/chkRecommended"
-        android:layout_below="@+id/chkFavourite"
-        android:layout_alignLeft="@+id/chkFavourite"
-        android:layout_alignStart="@+id/chkFavourite"
-        android:checked="false" />
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_favourite"
+            android:id="@+id/chkFavourite"
+            android:checked="false" />
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/checkbox_disliked"
-        android:id="@+id/chkDislike"
-        android:checked="false"
-        android:layout_below="@+id/chkRecommended"
-        android:layout_toRightOf="@+id/chkWishlist"
-        android:layout_toEndOf="@+id/chkWishlist" />
+    </LinearLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_filter_text"
-        android:id="@+id/buttonFilter"
-        android:layout_below="@+id/chkRecommended"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="50dp"
-        android:layout_alignRight="@+id/chkLiked"
-        android:layout_alignEnd="@+id/chkLiked"
-        android:onClick="onClick"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_span="3"
+        android:orientation="vertical">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_clear_text"
-        android:id="@+id/buttonClear"
-        android:layout_alignBottom="@+id/buttonFilter"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@+id/chkRecommended"
-        android:layout_toEndOf="@+id/chkRecommended"
-        android:onClick="onClick"/>
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/rec_icon"
+            android:src="@drawable/ic_action_person"
+            android:layout_gravity="center_horizontal"/>
 
-</RelativeLayout>
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_recommended"
+            android:id="@+id/chkRecommended"
+            android:checked="false"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+
+    </TableRow>
+<TableRow android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/wish_icon"
+            android:src="@drawable/ic_action_important"
+            android:layout_gravity="center_horizontal"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_wishlist"
+            android:id="@+id/chkWishlist"
+            android:checked="false"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/filter_row_1"
+        android:orientation="vertical"
+        >
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/liked_icon"
+            android:src="@drawable/ic_action_good"
+            android:layout_gravity="center_horizontal"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_liked"
+            android:id="@+id/chkLiked"
+            android:checked="false" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/filter_row_4"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/dislike_icon"
+            android:src="@drawable/ic_action_bad"
+            android:layout_gravity="center_horizontal"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_disliked"
+            android:id="@+id/chkDislike"
+            android:checked="false" />
+    </LinearLayout>
+</TableRow>
+
+</TableLayout>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="0.2"
+    android:layout_gravity="center_horizontal">
+<Button
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:text="@string/button_filter_text"
+    android:id="@+id/buttonFilter"
+    android:onClick="onClick"
+    android:layout_weight="0.5"
+    />
+
+<Button
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="0.5"
+    android:text="@string/button_clear_text"
+    android:id="@+id/buttonClear"
+    android:layout_alignBottom="@+id/buttonFilter"
+    android:onClick="onClick"/>
+</LinearLayout>
+</LinearLayout>

@@ -99,7 +99,6 @@ public class LoginActivity extends Activity {
         }else{
 
             showMessage("Login Successful");
-            back();
             final UserGrid usergrid= ((MyApplication)getApplicationContext()).usergrid;
 
             new AsyncTask<Void, Void, HashMap<String, Pin>>(){
@@ -126,10 +125,11 @@ public class LoginActivity extends Activity {
             markerList.add(tempPin);
         }
 
-        Intent addUserPinIntent = new Intent(this,MainActivity.class);
-        addUserPinIntent.putExtra("Search",false);
+        Intent addUserPinIntent = new Intent();
         addUserPinIntent.putParcelableArrayListExtra("Pins",markerList);
-        startActivity(addUserPinIntent);
+        addUserPinIntent.putExtra("Search",false);
+        setResult(3,addUserPinIntent);
+        finish();
     }
 
     private void newUser(String username, String pass, String email){
