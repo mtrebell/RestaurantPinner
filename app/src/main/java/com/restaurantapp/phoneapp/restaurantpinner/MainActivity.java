@@ -211,14 +211,19 @@ public class MainActivity extends FragmentActivity {
             case 4:
                 ArrayList<String> delete = extras.getStringArrayList("delete");
                 if(delete!=null)
-                    for(String d:delete)
-                        for(Pin pin:pins)
-                            if(pin.uuid.equals(delete))
+                    for(String d:delete) {
+                        for (Pin pin : pins)
+                            if (pin.uuid.equals(delete))
                                 pins.remove(pin);
+                        for (Pin pin2: fullPins)
+                            if (pin2.uuid.equals(delete))
+                                pins.remove(pin2);
+                    }
 
                 ArrayList<Pin> update = extras.getParcelableArrayList("update");
                 if(update!=null) {
                     pins.addAll(update);
+                    fullPins.addAll(update);
                 }
                 displayPins();
                 break;
