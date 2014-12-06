@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -85,6 +86,8 @@ public class SearchActivity extends Activity {
     private  void getLoc(){
         final Geocode geocoder = new Geocode(this);
         final double[] loc = geocoder.getLocation();
+        if(loc==null)
+            Toast.makeText(this,"Could not get location",Toast.LENGTH_SHORT);
         lat= loc[0];
         lng=loc[1];
 
