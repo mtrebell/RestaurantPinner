@@ -33,6 +33,14 @@ public class MarkerDialog extends Dialog {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.dialog_marker);
+        MyApplication app = (MyApplication) parent.getApplicationContext();
+        boolean user = app.usergrid.getUID()!=null;
+        Button pin = (Button)findViewById(R.id.restraunt_add);
+        
+        if(user)
+            pin.setVisibility(View.VISIBLE);
+        else
+            pin.setVisibility(View.INVISIBLE);
 
         TextView phone = (TextView) findViewById(R.id.restraunt_phone);
         TextView address = (TextView) findViewById(R.id.restraunt_address);
@@ -65,7 +73,6 @@ public class MarkerDialog extends Dialog {
                 phone.setText(restaurant.getString("phone"));
 
             } catch (JSONException e) {
-                //TOAST COULD NOT LOAD INFO
             }
         }
         this.getWindow().setGravity(Gravity.BOTTOM);
@@ -88,7 +95,6 @@ public class MarkerDialog extends Dialog {
                         addIntent.putExtra("restaurant", restaurant.getString("uuid"));
                         parent.startActivityForResult(addIntent,5);
                     } catch (JSONException e) {
-                        //Could not get restraunt data TOAST
                     }
 
                 }

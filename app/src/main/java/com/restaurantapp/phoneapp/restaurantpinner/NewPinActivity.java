@@ -86,7 +86,6 @@ public class NewPinActivity extends Activity {
 
     public void onClick(View v){
         switch(v.getId()){
-            //case R.id.button_current:
             case R.id.button_clear:
                 endTask();
             case R.id.button_send:
@@ -96,7 +95,6 @@ public class NewPinActivity extends Activity {
 
 
     public void submit() {
-        Log.d("Trying to sumbit","------------");
 
         final UserGrid usergrid = ((MyApplication) getApplicationContext()).usergrid;
 
@@ -110,14 +108,12 @@ public class NewPinActivity extends Activity {
             types.add(UserGrid.DIS);
 
         if (types.isEmpty() && !rec.isChecked()) {
-            Log.d("TYPES", "NO TYPES SELECTED");
             endTask();
         }
 
         else {
 
             if (uuid != null) {
-                Log.d("GOT UUID", uuid);
                 if (rec.isChecked())
                     getFriends();
                 else
@@ -130,9 +126,7 @@ public class NewPinActivity extends Activity {
                 new AsyncTask<Void, Void, ArrayList<MarkerOptions>>() {
                     @Override
                     protected ArrayList<MarkerOptions> doInBackground(Void... voids) {
-                        Log.d("Finding Restraunts","------------");
                         if (lat == -1) {
-                            //ERROR MESSAGE
                             return null;
                         }
 
@@ -149,14 +143,14 @@ public class NewPinActivity extends Activity {
         }
     }
 
-    public void launchConfirm(ArrayList<MarkerOptions> restraunts){
-        if (restraunts==null || restraunts.isEmpty()){
+    public void launchConfirm(ArrayList<MarkerOptions> restaurants){
+        if (restaurants==null || restaurants.isEmpty()){
             Toast toast = Toast.makeText(this, "Could not find any restraunts", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }
         else
-            new ConfirmDialog(restraunts,this);
+            new ConfirmDialog(restaurants,this);
     }
 
     public void buildButtons(){
@@ -167,11 +161,8 @@ public class NewPinActivity extends Activity {
         dis= (CheckBox)findViewById(R.id.chkDislike);
     }
 
-    //load confirmdialog
-    //addPin
     public void getFriends() {
 
-        //Add Recomendations
     if(rec.isChecked()){
         final UserGrid usergrid = ((MyApplication) getApplicationContext()).usergrid;
 
@@ -238,6 +229,7 @@ public class NewPinActivity extends Activity {
     }
 
     private void populatePin(){
+        Log.d("GOT HERE","POPULATE PIN");
         final UserGrid usergrid =  ((MyApplication) getApplicationContext()).usergrid;
         new AsyncTask<Void,Void,JSONObject>(){
 
@@ -253,6 +245,7 @@ public class NewPinActivity extends Activity {
     }
 
     private void fillInfo(JSONObject restaurantInfo){
+        Log.d("GOT HERE",restaurantInfo.toString());
         Pin newPin;
         try {
             System.out.println("Fill Info");
@@ -261,12 +254,12 @@ public class NewPinActivity extends Activity {
             double lat = latlng.getDouble("latitude");
             double lng = latlng.getDouble("longitude");
             newPin = new Pin(uuid,name,types,lat,lng);
+            Log.d("GOT HERE",newPin.uuid);
             Intent newPinIntent = new Intent();
             newPinIntent.putExtra("NewPin",newPin);
-            setResult(5,newPinIntent);
+            this.setResult(5,newPinIntent);
             finish();
         }catch (JSONException e){
-            System.out.println("JSONException ocurred");
             finish();
         }
     }
@@ -275,7 +268,6 @@ public class NewPinActivity extends Activity {
         MarkerAdapter adapter;
         ListView lv;
         public int selected =0;
-
 
         public ConfirmDialog(ArrayList<MarkerOptions> restaurants,Context context) {
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);

@@ -187,12 +187,13 @@ public class MainActivity extends FragmentActivity {
         if(data == null)
             return;
         Bundle extras = data.getExtras();
-        System.out.println("requestCode: " + requestCode);
+
         switch(requestCode){
             case 1:
                 search=true;
                 markers=extras.getParcelableArrayList("Markers");
-                if(dislikeIds != null)
+                UserGrid usergrid = ((MyApplication) getApplicationContext()).usergrid;
+                if(usergrid.getUID()!=null)
                     if(!displayDislike)
                         filterDislike();
                 displayPins();
@@ -215,11 +216,11 @@ public class MainActivity extends FragmentActivity {
                 if(delete!=null)
                     for(String d:delete) {
                         for (Pin pin : pins)
-                            if (pin.uuid.equals(delete))
+                            if (pin.uuid.equals(d))
                                 pins.remove(pin);
                         for (Pin pin2: fullPins)
-                            if (pin2.uuid.equals(delete))
-                                pins.remove(pin2);
+                            if (pin2.uuid.equals(d))
+                                fullPins.remove(pin2);
                     }
 
                 ArrayList<Pin> update = extras.getParcelableArrayList("update");
@@ -240,6 +241,7 @@ public class MainActivity extends FragmentActivity {
                     } else
                         pins.add(tempPin);
                 }
+                displayPins();
                 break;
         }
     }
@@ -254,6 +256,7 @@ public class MainActivity extends FragmentActivity {
 
     private void displayPins(){
         Bundle data = new Bundle();
+
         if(filtered != null)
             data.putParcelableArrayList("Pins", filtered);
         else if(search)
