@@ -1,84 +1,23 @@
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/addPinLoc"
-            android:layout_span="2"
-            android:layout_height="wrap_content"
-            android:text="Choose Marker"
-            android:layout_weight=".66"/>
-    </TableRow>
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <TableRow >
-        <ToggleButton
-            android:id="@+id/rec"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:background="@drawable/ic_action_person"
-            android:textOn="@string/toggle_turn_on"
-            android:textOff="@string/toggle_turn_off"
-            android:onClick="onClick"
-            android:textColor="@android:color/holo_blue_dark"
-            />
-        <ToggleButton
-            android:id="@+id/fav"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:background="@drawable/ic_action_favorite"
-            android:textOn="@string/toggle_turn_on"
-            android:textOff="@string/toggle_turn_off"
-            android:onClick="onClick"
-            android:textColor="@android:color/holo_blue_dark"
+    <include layout="@layout/pin_table"
+        android:layout_weight="0.5"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
 
-            />
-        <ToggleButton
-            android:id="@+id/wish"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:background="@drawable/ic_action_important"
-            android:textOn="@string/toggle_turn_on"
-            android:textOff="@string/toggle_turn_off"
-            android:onClick="onClick"
-            android:textColor="@android:color/holo_blue_dark"
-            />
-
-    </TableRow>
-
-    <TableRow>
-        <ToggleButton
-            android:id="@+id/like"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:background="@drawable/ic_action_good"
-            android:textOn="@string/toggle_turn_on"
-            android:textOff="@string/toggle_turn_off"
-            android:onClick="onClick"
-            android:textColor="@android:color/holo_blue_dark"
-            />
-        <ToggleButton
-            android:id="@+id/dis"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:background="@drawable/ic_action_bad"
-            android:textOn="@string/toggle_turn_on"
-            android:textOff="@string/toggle_turn_off"
-            android:onClick="onClick"
-            android:textColor="@android:color/holo_blue_dark"
-            />
-    </TableRow>
-    <TableRow>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_weight="0.2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
         <Button
             android:id="@+id/button_send"
             android:layout_weight=".5"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
             android:text="@string/button_send_text"
             android:onClick="onClick"
 
@@ -87,10 +26,11 @@
         <Button
             android:id="@+id/button_clear"
             android:layout_weight=".5"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
             android:text="@string/button_clear_text"
             android:onClick="onClick"
             />
-    </TableRow>
+    </LinearLayout>
 
-</TableLayout>
+</LinearLayout>

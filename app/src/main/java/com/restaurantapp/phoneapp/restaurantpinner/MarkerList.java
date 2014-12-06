@@ -44,6 +44,11 @@ public class MarkerList extends ListFragment implements UpdatableFragment {
                 pinAdapter.notifyDataSetChanged();
             }
         }
+        else{
+            setListAdapter(markerAdapter);
+            markerAdapter.notifyDataSetChanged();
+        }
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 

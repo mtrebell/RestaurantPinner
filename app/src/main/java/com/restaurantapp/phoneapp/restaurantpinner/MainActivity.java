@@ -36,7 +36,7 @@ public class MainActivity extends FragmentActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        search=true;
         adapter = new TabAdapter(getSupportFragmentManager());
 
         pager = (ViewPager)findViewById(R.id.pager);
@@ -44,28 +44,25 @@ public class MainActivity extends FragmentActivity {
         pager.setOffscreenPageLimit(2);
 
         addTabs();
-        System.out.println("onCreate");
         if(savedInstanceState != null) {
             int index = savedInstanceState.getInt("index");
             getActionBar().setSelectedNavigationItem(index);
             getActionBar().setSelectedNavigationItem(index);
             pins = savedInstanceState.getParcelableArrayList("Pins");
+            markers = savedInstanceState.getParcelableArrayList("Markers");
+            filtered = savedInstanceState.getParcelableArrayList("Filtered");
             search = savedInstanceState.getBoolean("Search");
         }
 
         Bundle extras = getIntent().getExtras();
-        search = true;
-
         if(extras!=null) {
-            if(extras.containsKey("Search")){
-                search = extras.getBoolean("Search");
-            }
-
             if (extras.containsKey("Markers")) {
                 markers = extras.getParcelableArrayList("Markers");
+                search = true;
             }
             if (extras.containsKey("Pins")) {
                 pins = extras.getParcelableArrayList("Pins");
+                search=false;
             }
             if (extras.containsKey("Filtered")){
                 filtered = extras.getParcelableArrayList("Filtered");
@@ -73,7 +70,6 @@ public class MainActivity extends FragmentActivity {
         }
         if(pins != null || markers != null || filtered != null)
             displayPins();
-
 
         Button button = (Button) findViewById(R.id.action_filter);
         button.setOnClickListener(new View.OnClickListener() {
@@ -150,13 +146,18 @@ public class MainActivity extends FragmentActivity {
                 openLogout();
                 return true;
             case R.id.action_changeview:
-                displayPins();
-                search = !search;
+                changeView();
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void changeView(){
+        filtered=null;
+        search = !search;
+        displayPins();
     }
 
 
@@ -166,6 +167,8 @@ public class MainActivity extends FragmentActivity {
         int i = getActionBar().getSelectedNavigationIndex();
         outState.putInt("index", i);
         outState.putParcelableArrayList("Pins",pins);
+        outState.putParcelableArrayList("Markers", markers);
+        outState.putParcelableArrayList("Filtered", filtered);
         outState.putBoolean("Search", search);
     }
 
@@ -177,8 +180,7 @@ public class MainActivity extends FragmentActivity {
         Bundle extras = data.getExtras();
         switch(requestCode){
             case 1:
-
-                search=extras.getBoolean("Search");
+                search=true;
                 markers=extras.getParcelableArrayList("Markers");
                 displayPins();
                 break;
@@ -188,7 +190,6 @@ public class MainActivity extends FragmentActivity {
                 break;
             case 3:
                 pins = extras.getParcelableArrayList("Pins");
-                System.out.println(pins.toString());
                 search = false;
                 displayPins();
                 break;
@@ -198,10 +199,8 @@ public class MainActivity extends FragmentActivity {
     private void displayPins(){
         Bundle data = new Bundle();
         if(filtered != null) {
-            System.out.println("opening filtered");
             data.putParcelableArrayList("Pins", filtered);
         }else if(search) {
-            System.out.println("opening markers");
             data.putParcelableArrayList("Markers", markers);
         }else
             data.putParcelableArrayList("Pins", pins);
@@ -237,7 +236,7 @@ public class MainActivity extends FragmentActivity {
 
     private void openSearch() {
         Intent searchIntent = new Intent(this,SearchActivity.class);
-        startActivityForResult(searchIntent,1);
+        startActivityForResult(searchIntent, 1);
     }
 
     private void openFilter( ) {
@@ -253,7 +252,7 @@ public class MainActivity extends FragmentActivity {
 
     private void openLogin() {
         Intent loginIntent = new Intent(this,LoginActivity.class);
-        startActivityForResult(loginIntent,3);
+        startActivityForResult(loginIntent, 3);
     }
 
     private void openNotification() {

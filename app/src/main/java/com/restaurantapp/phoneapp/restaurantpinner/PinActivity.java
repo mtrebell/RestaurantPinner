@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -276,7 +277,7 @@ public class PinActivity extends Activity {
 
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
             LayoutInflater inflater = getLayoutInflater();
-            View convertView = inflater.inflate(R.layout.edit_dialog, null);
+            View convertView = inflater.inflate(R.layout.pin_table, null);
             alertDialog.setView(convertView);
             alertDialog.setTitle("Confirm Restaurant");
             alertDialog.setPositiveButton("Update", new DialogInterface.OnClickListener() {
@@ -297,11 +298,11 @@ public class PinActivity extends Activity {
         }
 
         private void setUpToggle(View view) {
-            ToggleButton fav = (ToggleButton) view.findViewById(R.id.fav);
-            ToggleButton like = (ToggleButton) view.findViewById(R.id.like);
-            ToggleButton wish = (ToggleButton) view.findViewById(R.id.wish);
-            ToggleButton rec = (ToggleButton) view.findViewById(R.id.rec);
-            ToggleButton dis = (ToggleButton) view.findViewById(R.id.dis);
+            CheckBox fav = (CheckBox) view.findViewById(R.id.chkFavourite);
+            CheckBox like = (CheckBox) view.findViewById(R.id.chkLiked);
+            CheckBox wish = (CheckBox) view.findViewById(R.id.chkWishlist);
+            CheckBox rec = (CheckBox) view.findViewById(R.id.chkRecommended);
+            CheckBox dis = (CheckBox) view.findViewById(R.id.chkDislike);
 
             //Set toggle state
             fav.setChecked(restaurant.types.contains(UserGrid.FAV));
@@ -309,39 +310,6 @@ public class PinActivity extends Activity {
             wish.setChecked(restaurant.types.contains(UserGrid.WISH));
             rec.setChecked(restaurant.types.contains(UserGrid.REC));
             dis.setChecked(restaurant.types.contains(UserGrid.DIS));
-        }
-
-    }
-
-    public void onToggleClick(View view) {
-        boolean on = ((ToggleButton) view).isChecked();
-        String type;
-        switch (view.getId()) {
-            case R.id.rec:
-                type = UserGrid.REC;
-                break;
-            case R.id.fav:
-                type = UserGrid.FAV;
-                break;
-            case R.id.wish:
-                type = UserGrid.WISH;
-                break;
-            case R.id.like:
-                type = UserGrid.LIKE;
-                break;
-            case R.id.dis:
-                type = UserGrid.DIS;
-                break;
-            default:
-                return;
-        }
-
-        if (on) {
-            add.add(type);
-            remove.remove(type);
-        } else {
-            add.remove(type);
-            remove.add(type);
         }
 
     }
