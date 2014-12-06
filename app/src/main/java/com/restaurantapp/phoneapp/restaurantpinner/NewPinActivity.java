@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -31,11 +32,11 @@ public class NewPinActivity extends Activity {
     double lat=-1;
     double lng=-1;
 
-    ToggleButton fav;
-    ToggleButton like;
-    ToggleButton wish;
-    ToggleButton rec;
-    ToggleButton dis;
+    CheckBox fav;
+    CheckBox like;
+    CheckBox wish;
+    CheckBox rec;
+    CheckBox dis;
 
     List<String> types;
     private String uuid;
@@ -153,11 +154,11 @@ public class NewPinActivity extends Activity {
     }
 
     public void buildButtons(){
-        fav = (ToggleButton)findViewById(R.id.fav);
-        like = (ToggleButton)findViewById(R.id.like);
-        wish = (ToggleButton)findViewById(R.id.wish);
-        rec = (ToggleButton)findViewById(R.id.rec);
-        dis= (ToggleButton)findViewById(R.id.dis);
+        fav = (CheckBox)findViewById(R.id.chkFavourite);
+        like = (CheckBox)findViewById(R.id.chkLiked);
+        wish = (CheckBox)findViewById(R.id.chkWishlist);
+        rec = (CheckBox)findViewById(R.id.chkRecommended);
+        dis= (CheckBox)findViewById(R.id.chkDislike);
     }
 
     //load confirmdialog
