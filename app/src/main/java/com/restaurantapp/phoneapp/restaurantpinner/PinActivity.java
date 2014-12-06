@@ -36,6 +36,11 @@ public class PinActivity extends Activity {
     ListView lv;
     List<String> add = new ArrayList<String>();
     List<String> remove = new ArrayList<String>();
+    ArrayList<String> delete =new ArrayList<String>();
+    ArrayList<Pin> update =new ArrayList<Pin>();
+    public final int DELETE =0;
+    public final int UPDATE =1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +82,10 @@ public class PinActivity extends Activity {
             changeButtons();
               break;
             case R.id.action_home:
+                Intent intent = new Intent();
+                intent.putStringArrayListExtra("delete",delete);
+                intent.putParcelableArrayListExtra("update",update);
+                setResult(4,intent);
                 finish();
         }
         return super.onOptionsItemSelected(item);
@@ -109,6 +118,18 @@ public class PinActivity extends Activity {
     }
 
     public void update(final String restaurant, final List<String> add, final List<String> delete) {
+
+       // update the data list
+        Pin updated = pins.get(restaurant);
+        updated.types.removeAll(delete);
+        updated.types.addAll(add);
+        pins.put(restaurant, updated);
+        adapter.notifyDataSetChanged();
+
+        update.add(pins.get(restaurant));
+        delete.add(restaurant);
+
+        //update the DB
         new AsyncTask<Void, Void, Void>() {
 
             @Override
@@ -257,6 +278,8 @@ public class PinActivity extends Activity {
     }
 
     private void removePin(Pin pin) {
+        delete.add(pin.uuid);
+
         new AsyncTask<Pin, Void, Void>() {
 
             @Override

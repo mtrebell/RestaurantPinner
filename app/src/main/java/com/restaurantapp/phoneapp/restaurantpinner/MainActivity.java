@@ -2,6 +2,7 @@ package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,8 +31,7 @@ public class MainActivity extends FragmentActivity {
     private Menu menu;
     Boolean search;
     Boolean displayDislike;
-
-
+    Dialog dialog;
     ArrayList<MarkerOptions> markers;
     ArrayList<Pin> pins;
     ArrayList<Pin> filtered;
@@ -166,7 +167,6 @@ public class MainActivity extends FragmentActivity {
         displayPins();
     }
 
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -183,7 +183,7 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
         if(data == null)
             return;
         Bundle extras = data.getExtras();
@@ -205,28 +205,49 @@ public class MainActivity extends FragmentActivity {
                 fullPins = extras.getParcelableArrayList("FullPins");
                 dislikeIds = extras.getStringArrayList("DislikeIds");
                 search = false;
+                setVisability(true);
+                displayPins();
+                break;
+            case 4:
+                ArrayList<String> delete = extras.getStringArrayList("delete");
+                if(delete!=null)
+                    for(String d:delete)
+                        for(Pin pin:pins)
+                            if(pin.uuid.equals(delete))
+                                pins.remove(pin);
+
+                ArrayList<Pin> update = extras.getParcelableArrayList("update");
+                if(update!=null) {
+                    pins.addAll(update);
+                }
                 displayPins();
                 break;
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        if(dialog!=null)
+            dialog.dismiss();
+        dialog=null;
+        super.onDestroy();
+    }
+
     private void displayPins(){
         Bundle data = new Bundle();
-        if(filtered != null) {
+        if(filtered != null)
             data.putParcelableArrayList("Pins", filtered);
-        }else if(search) {
+        else if(search)
             data.putParcelableArrayList("Markers", markers);
-        }else {
+        else
             data.putParcelableArrayList("Pins", pins);
-            setVisability(true);
-        }
 
        adapter.setData(data);
        pager.getAdapter().notifyDataSetChanged();
     }
 
     private void openNewPin() {
-        new AlertDialog.Builder(this)
+        dialog= new AlertDialog.Builder(this)
                 .setTitle("Add Pin")
                 .setMessage("To add a pin tap and hold any location on the map")
                 .setPositiveButton("Use Current", new DialogInterface.OnClickListener() {
@@ -279,7 +300,7 @@ public class MainActivity extends FragmentActivity {
 
     private  void openPins(){
         Intent newIntent = new Intent(this,PinActivity.class);
-        startActivity(newIntent);
+        startActivityForResult(newIntent, 4);
     }
 
     private void openFriends(){
@@ -370,7 +391,4 @@ public class MainActivity extends FragmentActivity {
                         .setTabListener(tabListener));
         }
     }
-
-
-
 
