@@ -94,6 +94,8 @@ public class MainActivity extends FragmentActivity {
             item.setVisible(false);
             item = menu.findItem(R.id.action_login);
             item.setVisible(true);
+            item = menu.findItem(R.id.action_notification);
+            item.setVisible(false);
         }else
         {
             item = menu.findItem(R.id.action_account);
@@ -105,6 +107,8 @@ public class MainActivity extends FragmentActivity {
             item = menu.findItem(R.id.action_logout);
             item.setVisible(true);
             item = menu.findItem(R.id.action_login);
+            item.setVisible(false);
+            item = menu.findItem(R.id.action_notification);
             item.setVisible(false);
         }
         return true;

@@ -40,7 +40,7 @@
             android:name="com.restaurantapp.phoneapp.restaurantpinner.SearchActivity"
             android:label="@string/title_activity_search"
             android:parentActivityName="com.restaurantapp.phoneapp.restaurantpinner.MainActivity"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" >
+            android:theme="@style/main_dialog_theme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MyActivity" />
@@ -49,7 +49,7 @@
             android:name="com.restaurantapp.phoneapp.restaurantpinner.FilterActivity"
             android:label="@string/title_activity_filter"
             android:parentActivityName="com.restaurantapp.phoneapp.restaurantpinner.MainActivity"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" >
+            android:theme="@style/main_dialog_theme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MyActivity" />
@@ -58,7 +58,7 @@
             android:name="com.restaurantapp.phoneapp.restaurantpinner.NewPinActivity"
             android:label="@string/title_activity_addPin"
             android:parentActivityName="com.restaurantapp.phoneapp.restaurantpinner.MainActivity"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" >
+            android:theme="@style/main_dialog_theme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fix.myapplication.MyActivity" />
@@ -71,7 +71,7 @@
         <activity
             android:name="com.restaurantapp.phoneapp.restaurantpinner.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@android:style/Theme.Holo.Light.Dialog">
+            android:theme="@style/main_dialog_theme">
            <meta-data
                android:name="android.support.PARENT_ACTIVITY"
                android:value="com.example.fix.myapplication.MyActivity" />
