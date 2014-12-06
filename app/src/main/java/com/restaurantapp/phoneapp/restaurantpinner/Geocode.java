@@ -1,6 +1,5 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
-
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
@@ -51,6 +50,7 @@ public final class Geocode implements LocationListener {
     }
 
     public double[] getLocation(){
+
         LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
        boolean gpsLoc = manager.isProviderEnabled( LocationManager.GPS_PROVIDER);

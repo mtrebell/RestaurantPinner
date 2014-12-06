@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -171,7 +172,7 @@ public class MainActivity extends FragmentActivity {
         super.onSaveInstanceState(outState);
         int i = getActionBar().getSelectedNavigationIndex();
         outState.putInt("index", i);
-        outState.putParcelableArrayList("Pins",pins);
+        outState.putParcelableArrayList("Pins", pins);
         outState.putParcelableArrayList("FullPins",fullPins);
         outState.putParcelableArrayList("Markers", markers);
         outState.putParcelableArrayList("Filtered", filtered);
@@ -230,19 +231,10 @@ public class MainActivity extends FragmentActivity {
                 .setMessage("To add a pin tap and hold any location on the map")
                 .setPositiveButton("Use Current", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        new AsyncTask<Void, Void, double[]>() {
-
-                            @Override
-                            protected double[] doInBackground(Void... voids) {
                                 Geocode geocoder = new Geocode(MainActivity.this);
-                                return geocoder.getLocation();
-                            }
-
-                            @Override
-                            protected void onPostExecute(double[] result) {
+                                double[] result = geocoder.getLocation();
                                 openNewPin(result);
-                            }
-                        }.execute();
+
                     }
                 })
                 .setIcon(android.R.drawable.ic_input_add)
@@ -276,11 +268,13 @@ public class MainActivity extends FragmentActivity {
         startActivity(notIntent);
     }
 
-    private  void openNewPin(double[] loc){
-        Intent newIntent = new Intent(this,NewPinActivity.class);
-        newIntent.putExtra("lat",loc[0]);
-        newIntent.putExtra("lng",loc[1]);
-        startActivity(newIntent);
+    private  void openNewPin(double[] loc) {
+        if (loc != null) {
+            Intent newIntent = new Intent(this, NewPinActivity.class);
+            newIntent.putExtra("lat", loc[0]);
+            newIntent.putExtra("lng", loc[1]);
+            startActivity(newIntent);
+        }
     }
 
     private  void openPins(){
