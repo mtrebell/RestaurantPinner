@@ -22,9 +22,14 @@ import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 public class NewPinActivity extends Activity {
@@ -40,6 +45,7 @@ public class NewPinActivity extends Activity {
 
     List<String> types;
     private String uuid;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,7 +224,7 @@ public class NewPinActivity extends Activity {
             }
 
             protected void onPostExecute(Void voids) {
-                endTask();
+                populatePin();
             }
         }.execute(friends);
     }
@@ -227,7 +233,42 @@ public class NewPinActivity extends Activity {
         uuid =null;
         lat=-1;
         lng=-1;
+
         finish();
+    }
+
+    private void populatePin(){
+        final UserGrid usergrid =  ((MyApplication) getApplicationContext()).usergrid;
+        new AsyncTask<Void,Void,JSONObject>(){
+
+            @Override
+            protected JSONObject doInBackground(Void... voids) {
+                return usergrid.restaurantInfo(uuid);
+            }
+            @Override
+            protected void onPostExecute(JSONObject json) {
+                fillInfo(json);
+            }
+        }.execute();
+    }
+
+    private void fillInfo(JSONObject restaurantInfo){
+        Pin newPin;
+        try {
+            System.out.println("Fill Info");
+            String name = restaurantInfo.getString("name");
+            JSONObject latlng = restaurantInfo.getJSONObject("location");
+            double lat = latlng.getDouble("latitude");
+            double lng = latlng.getDouble("longitude");
+            newPin = new Pin(uuid,name,types,lat,lng);
+            Intent newPinIntent = new Intent();
+            newPinIntent.putExtra("NewPin",newPin);
+            setResult(5,newPinIntent);
+            finish();
+        }catch (JSONException e){
+            System.out.println("JSONException ocurred");
+            finish();
+        }
     }
 
     public class ConfirmDialog{

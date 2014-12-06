@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Pin implements Parcelable {
     public double lat,lng;
@@ -36,6 +37,22 @@ public class Pin implements Parcelable {
         this.lng=lng;
         types = new ArrayList<String>();
         types.add(type);
+
+        LatLng latlng = new LatLng(lat,lng);
+        marker = new MarkerOptions()
+                .position(latlng)
+                .title(name)
+                .snippet(uuid);
+    }
+
+    public Pin(String uuid, String name, List<String> type,double lat, double lng){
+        this.uuid=uuid;
+        this.name=name;
+        this.lat=lat;
+        this.lng=lng;
+        address = "";
+        types = new ArrayList<String>();
+        types.addAll(type);
 
         LatLng latlng = new LatLng(lat,lng);
         marker = new MarkerOptions()

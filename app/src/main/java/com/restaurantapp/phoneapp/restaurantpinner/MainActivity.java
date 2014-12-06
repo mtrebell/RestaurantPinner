@@ -205,6 +205,17 @@ public class MainActivity extends FragmentActivity {
                 fullPins = extras.getParcelableArrayList("FullPins");
                 dislikeIds = extras.getStringArrayList("DislikeIds");
                 search = false;
+                System.out.println("From new pins and login");
+                displayPins();
+                break;
+            case 5:
+                Pin tempPin = extras.getParcelable("NewPin");
+                System.out.println("New Pin");
+                fullPins.add(tempPin);
+                if(tempPin.types.contains("dislike")){
+                    dislikeIds.add(tempPin.uuid);
+                }else
+                    pins.add(tempPin);
                 displayPins();
                 break;
         }
@@ -273,7 +284,7 @@ public class MainActivity extends FragmentActivity {
             Intent newIntent = new Intent(this, NewPinActivity.class);
             newIntent.putExtra("lat", loc[0]);
             newIntent.putExtra("lng", loc[1]);
-            startActivity(newIntent);
+            startActivityForResult(newIntent,5);
         }
     }
 
