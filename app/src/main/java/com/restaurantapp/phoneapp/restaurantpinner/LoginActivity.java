@@ -119,6 +119,7 @@ public class LoginActivity extends Activity {
     private void onUserPinsComplete(HashMap<String, Pin> result){
         ArrayList<Pin> markerList = new ArrayList<Pin>();
         ArrayList<Pin> fullList = new ArrayList<Pin>();
+        ArrayList<String> dislikeIds = new ArrayList<String>();
 
         Iterator it = result.entrySet().iterator();
         while(it.hasNext()){
@@ -127,12 +128,15 @@ public class LoginActivity extends Activity {
             fullList.add(tempPin);
             if(!tempPin.types.contains("dislike"))
                 markerList.add(tempPin);
+            else
+                dislikeIds.add(tempPin.uuid);
         }
 
         Intent addUserPinIntent = new Intent();
         addUserPinIntent.putParcelableArrayListExtra("Pins",markerList);
         addUserPinIntent.putParcelableArrayListExtra("FullPins",fullList);
-        addUserPinIntent.putExtra("Search",false);
+        addUserPinIntent.putStringArrayListExtra("DislikeIds", dislikeIds);
+        addUserPinIntent.putExtra("Search", false);
         setResult(3,addUserPinIntent);
         finish();
     }

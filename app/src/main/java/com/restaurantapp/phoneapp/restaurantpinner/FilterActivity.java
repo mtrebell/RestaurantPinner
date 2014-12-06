@@ -22,6 +22,7 @@ public class FilterActivity extends Activity {
     Boolean search;
     ArrayList<MarkerOptions> markers;
     ArrayList<Pin> pins;
+    Boolean displayDislike;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,17 @@ public class FilterActivity extends Activity {
                 pins = extras.getParcelableArrayList("Pins");
                 search = false;
             }
+            if(extras.containsKey("DisplayDislike")){
+                displayDislike = extras.getBoolean("DisplayDislike");
+            }
         }
+
+        CheckBox dislikeBox;
+        if(displayDislike){
+            dislikeBox = (CheckBox)findViewById(R.id.chkDislike);
+            dislikeBox.toggle();
+        }
+
     }
 
     @Override
@@ -114,7 +125,9 @@ public class FilterActivity extends Activity {
         filterOptions = (CheckBox)findViewById(R.id.chkDislike);
         if(filterOptions.isChecked()){
             selectedPinTypes.add("dislike");
-        }
+            displayDislike = true;
+        }else
+            displayDislike = false;
 
         ArrayList<Pin>results;
         if(search)
@@ -125,6 +138,7 @@ public class FilterActivity extends Activity {
         Intent addUserPinIntent = new Intent();
         addUserPinIntent.putParcelableArrayListExtra("Filtered",results);
         addUserPinIntent.putExtra("Search",false);
+        addUserPinIntent.putExtra("DisplayDislike",displayDislike);
         setResult(2,addUserPinIntent);
         finish();
     }

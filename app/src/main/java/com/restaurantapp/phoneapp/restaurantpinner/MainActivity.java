@@ -27,11 +27,14 @@ public class MainActivity extends FragmentActivity {
     ViewPager pager;
     private Menu menu;
     Boolean search;
+    Boolean displayDislike;
+
 
     ArrayList<MarkerOptions> markers;
     ArrayList<Pin> pins;
     ArrayList<Pin> filtered;
     ArrayList<Pin> fullPins;
+    ArrayList<String> dislikeIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,7 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         search=true;
+        displayDislike=false;
         adapter = new TabAdapter(getSupportFragmentManager());
 
         pager = (ViewPager)findViewById(R.id.pager);
@@ -55,6 +59,8 @@ public class MainActivity extends FragmentActivity {
             filtered = savedInstanceState.getParcelableArrayList("Filtered");
             search = savedInstanceState.getBoolean("Search");
             fullPins = savedInstanceState.getParcelableArrayList("FullPins");
+            displayDislike = savedInstanceState.getBoolean("DisplayDislike");
+            dislikeIds = savedInstanceState.getStringArrayList("DislikeIds");
         }
 
         Bundle extras = getIntent().getExtras();
@@ -72,6 +78,9 @@ public class MainActivity extends FragmentActivity {
             }
             if (extras.containsKey("FullPins")) {
                 fullPins = extras.getParcelableArrayList("FullPins");
+            }
+            if (extras.containsKey("DislikeIds")){
+                dislikeIds = extras.getStringArrayList("DislikeIds");
             }
         }
         if(pins != null || markers != null || filtered != null)
@@ -167,6 +176,8 @@ public class MainActivity extends FragmentActivity {
         outState.putParcelableArrayList("Markers", markers);
         outState.putParcelableArrayList("Filtered", filtered);
         outState.putBoolean("Search", search);
+        outState.putBoolean("DisplayDislike",displayDislike);
+        outState.putStringArrayList("DislikeIds",dislikeIds);
     }
 
     @Override
@@ -179,15 +190,19 @@ public class MainActivity extends FragmentActivity {
             case 1:
                 search=true;
                 markers=extras.getParcelableArrayList("Markers");
+                if(!displayDislike)
+                    filterDislike();
                 displayPins();
                 break;
             case 2:
                 filtered = extras.getParcelableArrayList("Filtered");
+                displayDislike = extras.getBoolean("DisplayDislike");
                 displayPins();
                 break;
             case 3:
                 pins = extras.getParcelableArrayList("Pins");
                 fullPins = extras.getParcelableArrayList("FullPins");
+                dislikeIds = extras.getStringArrayList("DislikeIds");
                 search = false;
                 displayPins();
                 break;
@@ -245,7 +260,8 @@ public class MainActivity extends FragmentActivity {
         if(search)
             filterIntent.putParcelableArrayListExtra("Markers", markers);
 
-            filterIntent.putParcelableArrayListExtra("Pins", fullPins);
+        filterIntent.putParcelableArrayListExtra("Pins", fullPins);
+        filterIntent.putExtra("DisplayDislike", displayDislike);
 
         startActivityForResult(filterIntent, 2);
     }
@@ -313,6 +329,21 @@ public class MainActivity extends FragmentActivity {
         // following flag used to prevent users to use back button to navigate to logged in menu
         openMainActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(openMainActivity);
+    }
+
+    private void filterDislike(){
+        int idx = 0;
+        while(idx < markers.size()){
+            int idIndex = 0;
+            while(idIndex < dislikeIds.size()){
+                if(markers.get(idx).getSnippet().equals(dislikeIds.get(idIndex))){
+                    markers.remove(idx);
+                    break;
+                }else
+                    idIndex++;
+            }
+            idx++;
+        }
     }
 
     private void addTabs(){
