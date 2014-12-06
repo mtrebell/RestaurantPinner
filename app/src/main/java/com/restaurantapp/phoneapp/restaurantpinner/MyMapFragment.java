@@ -84,7 +84,6 @@ public class MyMapFragment extends Fragment implements UpdatableFragment {
         listener = null;
     }
 
-
     @Override
     public void update(Bundle data) {
         Log.d("ADDING", "update");

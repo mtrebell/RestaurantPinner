@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,9 +39,6 @@ public class PinActivity extends Activity {
     List<String> remove = new ArrayList<String>();
     ArrayList<String> delete =new ArrayList<String>();
     ArrayList<Pin> update =new ArrayList<Pin>();
-    public final int DELETE =0;
-    public final int UPDATE =1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +82,8 @@ public class PinActivity extends Activity {
             case R.id.action_home:
                 Intent intent = new Intent();
                 intent.putStringArrayListExtra("delete",delete);
-                intent.putParcelableArrayListExtra("update",update);
+                Log.d("delete", delete.toString());
+                intent.putParcelableArrayListExtra("update", update);
                 setResult(4,intent);
                 finish();
         }
