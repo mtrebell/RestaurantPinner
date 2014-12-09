@@ -36,7 +36,7 @@ public class MarkerDialog extends Dialog {
         MyApplication app = (MyApplication) parent.getApplicationContext();
         boolean user = app.usergrid.getUID()!=null;
         Button pin = (Button)findViewById(R.id.restraunt_add);
-        
+
         if(user)
             pin.setVisibility(View.VISIBLE);
         else
