@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class MainActivity extends FragmentActivity {
@@ -215,12 +216,24 @@ public class MainActivity extends FragmentActivity {
                 ArrayList<String> delete = extras.getStringArrayList("delete");
                 if(delete!=null)
                     for(String d:delete) {
-                        for (Pin pin : pins)
+                        Iterator<Pin>pinsIter = pins.iterator();
+                        while(pinsIter.hasNext()){
+                            Pin tempPin = pinsIter.next();
+                            if(tempPin.uuid.equals(d))
+                                pinsIter.remove();
+                        }
+                        /*for (Pin pin : pins)
                             if (pin.uuid.equals(d))
-                                pins.remove(pin);
-                        for (Pin pin2: fullPins)
+                                pins.remove(pin);*/
+                        Iterator<Pin>fullPinsIter = fullPins.iterator();
+                        while(fullPinsIter.hasNext()){
+                            Pin tempPin = fullPinsIter.next();
+                            if(tempPin.uuid.equals(d))
+                                fullPinsIter.remove();
+                        }
+                        /*for (Pin pin2: fullPins)
                             if (pin2.uuid.equals(d))
-                                fullPins.remove(pin2);
+                                fullPins.remove(pin2);*/
                     }
 
                 ArrayList<Pin> update = extras.getParcelableArrayList("update");
@@ -228,6 +241,7 @@ public class MainActivity extends FragmentActivity {
                     pins.addAll(update);
                     fullPins.addAll(update);
                 }
+
                 displayPins();
                 break;
             case 5:
