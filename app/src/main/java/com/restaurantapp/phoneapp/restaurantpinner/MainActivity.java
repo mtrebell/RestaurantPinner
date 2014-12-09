@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class MainActivity extends FragmentActivity {
@@ -187,7 +188,7 @@ public class MainActivity extends FragmentActivity {
         if(data == null)
             return;
         Bundle extras = data.getExtras();
-        Log.d("GOT HERE","GOT HERE");
+
         switch(requestCode){
             case 1:
                 search=true;
@@ -215,12 +216,19 @@ public class MainActivity extends FragmentActivity {
                 ArrayList<String> delete = extras.getStringArrayList("delete");
                 if(delete!=null)
                     for(String d:delete) {
-                        for (Pin pin : pins)
-                            if (pin.uuid.equals(d))
-                                pins.remove(pin);
-                        for (Pin pin2: fullPins)
-                            if (pin2.uuid.equals(d))
-                                fullPins.remove(pin2);
+                        Iterator<Pin>pinsIter = pins.iterator();
+                        while(pinsIter.hasNext()){
+                            Pin tempPin = pinsIter.next();
+                            if(tempPin.uuid.equals(d))
+                                pinsIter.remove();
+                        }
+                        
+                        Iterator<Pin>fullPinsIter = fullPins.iterator();
+                        while(fullPinsIter.hasNext()){
+                            Pin tempPin = fullPinsIter.next();
+                            if(tempPin.uuid.equals(d))
+                                fullPinsIter.remove();
+                        }
                     }
 
                 ArrayList<Pin> update = extras.getParcelableArrayList("update");
@@ -228,16 +236,20 @@ public class MainActivity extends FragmentActivity {
                     pins.addAll(update);
                     fullPins.addAll(update);
                 }
+
                 displayPins();
                 break;
             case 5:
                 Pin tempPin = extras.getParcelable("NewPin");
                 System.out.println("New Pin");
-                fullPins.add(tempPin);
-                if(tempPin.types.contains("dislike")){
-                    dislikeIds.add(tempPin.uuid);
-                }else
-                    pins.add(tempPin);
+                if(fullPins!=null && dislikeIds !=null && pins != null) {
+                    fullPins.add(tempPin);
+
+                    if (tempPin.types.contains("dislike")) {
+                        dislikeIds.add(tempPin.uuid);
+                    } else
+                        pins.add(tempPin);
+                }
                 displayPins();
                 break;
         }
@@ -313,7 +325,7 @@ public class MainActivity extends FragmentActivity {
             Intent newIntent = new Intent(this, NewPinActivity.class);
             newIntent.putExtra("lat", loc[0]);
             newIntent.putExtra("lng", loc[1]);
-            startActivityForResult(newIntent,5);
+            startActivityForResult(newIntent, 5);
         }
     }
 

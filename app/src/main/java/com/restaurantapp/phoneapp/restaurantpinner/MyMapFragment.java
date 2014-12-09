@@ -178,7 +178,7 @@ public class MyMapFragment extends Fragment implements UpdatableFragment {
             Intent addIntent = new Intent(getActivity(),NewPinActivity.class);
             addIntent.putExtra("lng",latLng.longitude);
             addIntent.putExtra("lat", latLng.latitude);
-            startActivity(addIntent);
+            getActivity().startActivityForResult(addIntent,5);
         }
     }
 

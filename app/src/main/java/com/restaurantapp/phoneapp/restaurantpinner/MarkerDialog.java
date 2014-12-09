@@ -93,7 +93,7 @@ public class MarkerDialog extends Dialog {
                     Intent addIntent = new Intent(parent,NewPinActivity.class);
                     try {
                         addIntent.putExtra("restaurant", restaurant.getString("uuid"));
-                        parent.startActivity(addIntent);
+                        parent.startActivityForResult(addIntent,5);
                     } catch (JSONException e) {
                     }
 
