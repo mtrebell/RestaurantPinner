@@ -222,18 +222,13 @@ public class MainActivity extends FragmentActivity {
                             if(tempPin.uuid.equals(d))
                                 pinsIter.remove();
                         }
-                        /*for (Pin pin : pins)
-                            if (pin.uuid.equals(d))
-                                pins.remove(pin);*/
+                        
                         Iterator<Pin>fullPinsIter = fullPins.iterator();
                         while(fullPinsIter.hasNext()){
                             Pin tempPin = fullPinsIter.next();
                             if(tempPin.uuid.equals(d))
                                 fullPinsIter.remove();
                         }
-                        /*for (Pin pin2: fullPins)
-                            if (pin2.uuid.equals(d))
-                                fullPins.remove(pin2);*/
                     }
 
                 ArrayList<Pin> update = extras.getParcelableArrayList("update");
