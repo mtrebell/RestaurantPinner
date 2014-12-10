@@ -3,6 +3,7 @@
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,11 +11,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,13 +70,38 @@ public class NotificationActivity extends Activity {
         if (editMode)
             lv.setOnItemClickListener(null);
 
-        //else
-            //notification clickListener
-        //if friend display details
-        //if map display like in PINACTIVITY
+        else
+        lv.setOnItemClickListener(new pinClickListener());
 
         adapter.setEdit(editMode);
         adapter.notifyDataSetChanged();
+    }
+
+    public class pinClickListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Notification restaurant = (Notification) adapter.getItem(i);
+            if(restaurant.type == Notification.PIN)
+                new AsyncTask<String, Void, JSONObject>() {
+
+                    @Override
+                    protected JSONObject doInBackground(String... strings) {
+                        return usergrid.restaurantInfo(strings[0]);
+                    }
+
+                    @Override
+                    protected void onPostExecute(JSONObject json) {
+                    openMap(json.toString());
+                }
+                }.execute(restaurant.uuid);
+        }
+    }
+
+    private  void openMap(String data){
+        Intent intent = new Intent(NotificationActivity.this,MapActivity.class);
+        intent.putExtra("data",data);
+        startActivity(intent);
     }
 
     public void getNotifications(){
