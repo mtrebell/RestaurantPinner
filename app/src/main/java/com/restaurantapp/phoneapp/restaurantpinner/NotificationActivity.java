@@ -168,7 +168,7 @@ public class NotificationActivity extends Activity {
 
             if(value.type==Notification.FRIEND){
                 icon.setImageResource(R.drawable.ic_action_add_person);
-                text.setText("New friend request from " + value.uuid);
+                text.setText("New friend request from " + value.name);
             }
             else{
                 icon.setImageResource(R.drawable.ic_action_newpin);
