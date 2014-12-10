@@ -64,7 +64,9 @@ public class MarkerDialog extends Dialog {
 
                 sb = new StringBuilder();
                 JSONArray hour = restaurant.getJSONArray("hours");
+                String[]days = {"M","T","W","Th","F","S","Su"};
                 for(int i=0;i<hour.length();i++){
+                    sb.append(days[i]+":");
                     sb.append(hour.getString(i));
                     sb.append(" ");
                 }

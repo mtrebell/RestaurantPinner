@@ -179,8 +179,10 @@ public class UserGrid {
 
     protected boolean addFriend( String friend){
         String query = "/users/" + uId + "/friends/users/"+friend+"?access_token="+accessToken;
+        String query2 = "/users/" + friend + "/friends/users/" + uId + "?access_token="+accessToken;
         try {
             sendPut(query,null);
+            sendPut(query2,null);
         } catch (IOException e) {
             return false;
         } catch (JSONException e) {

@@ -222,7 +222,7 @@ public class MainActivity extends FragmentActivity {
                             if(tempPin.uuid.equals(d))
                                 pinsIter.remove();
                         }
-                        
+
                         Iterator<Pin>fullPinsIter = fullPins.iterator();
                         while(fullPinsIter.hasNext()){
                             Pin tempPin = fullPinsIter.next();
