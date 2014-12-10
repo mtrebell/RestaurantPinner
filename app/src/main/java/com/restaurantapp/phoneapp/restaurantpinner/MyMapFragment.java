@@ -174,11 +174,13 @@ public class MyMapFragment extends Fragment implements UpdatableFragment {
 
         @Override
         public void onMapLongClick(LatLng latLng) {
-
-            Intent addIntent = new Intent(getActivity(),NewPinActivity.class);
-            addIntent.putExtra("lng",latLng.longitude);
-            addIntent.putExtra("lat", latLng.latitude);
-            getActivity().startActivityForResult(addIntent,5);
+            UserGrid usergrid = ((MyApplication) getActivity().getApplicationContext()).usergrid;
+            if(usergrid.getUID()!= null) {
+                Intent addIntent = new Intent(getActivity(), NewPinActivity.class);
+                addIntent.putExtra("lng", latLng.longitude);
+                addIntent.putExtra("lat", latLng.latitude);
+                getActivity().startActivityForResult(addIntent, 5);
+            }
         }
     }
 
