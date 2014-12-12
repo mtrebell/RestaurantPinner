@@ -1,6 +1,3 @@
-//Decide if handling exceptions in request functions or outside of them
-//Handle fail in delete
-
 package com.restaurantapp.phoneapp.restaurantpinner;
 
 import android.util.Log;
@@ -18,8 +15,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -192,8 +192,20 @@ public class UserGrid {
     }
 
     protected boolean removeFriend( String friend){
-        String query = "/users/" + uId + "/friends/"+friend+"?access_token="+accessToken;
-        request(query,"DELETE");
+        String entity ="/users?limit='"+limit+"'&ql=";
+        String query = "select uuid where username= '"+friend + "*'";
+
+        JSONObject response = sendGet(entity,query);
+
+        try {
+            JSONArray user = response.getJSONArray("list").getJSONArray(0);
+            String uuid = user.getString(0);
+            query = "/users/" + uId + "/friends/" + uuid + "?access_token=" + accessToken;
+            request(query, "DELETE");
+            } catch (JSONException e) {
+                return false;
+            }
+
         return true;
     }
 
