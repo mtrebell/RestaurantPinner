@@ -124,6 +124,8 @@ public class MainActivity extends FragmentActivity {
         item.setVisible(visability);
         item = menu.findItem(R.id.action_notification);
         item.setVisible(visability);
+        item = menu.findItem(R.id.action_newpin);
+        item.setVisible(visability);
     }
 
     @Override
@@ -222,7 +224,7 @@ public class MainActivity extends FragmentActivity {
                             if(tempPin.uuid.equals(d))
                                 pinsIter.remove();
                         }
-                        
+
                         Iterator<Pin>fullPinsIter = fullPins.iterator();
                         while(fullPinsIter.hasNext()){
                             Pin tempPin = fullPinsIter.next();
